@@ -131,17 +131,30 @@ hr.div{ border:none; border-top:1px solid var(--border); margin: 14px 0; }
 /* ================================
    EDIT BUTTON ONLY
    ================================ */
+/* Dark mode: keep as simple link */
 .edit-text {
   position:absolute; right:16px; top:16px;
   color: var(--primary);
   font-weight:700; font-size:13px;
   cursor:pointer; text-decoration:underline;
 }
+
+/* Light mode: make a pill for visibility */
 [data-theme="light"] .edit-text {
-  color: #0ea5e9;   /* ensure visible in light mode */
+  color: #0369a1;
+  background: rgba(3,105,161,0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+}
+[data-theme="light"] .edit-text:hover {
+  background: #0369a1;
+  color: white;
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # -------------------------------------------------
