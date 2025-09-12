@@ -13,6 +13,9 @@ st.set_page_config(page_title="Financial Dashboard", layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
+/* ================================
+   COLOR VARIABLES
+   ================================ */
 /* Default (dark mode) */
 :root, [data-theme="dark"] {
   --bg: #0b1220;
@@ -39,7 +42,7 @@ st.markdown("""
   --border:#d1d5db;
   --text:#111827;
   --muted:#6b7280;
-  --primary:#0ea5e9;     /* brighter cyan for light */
+  --primary:#0ea5e9;     
   --primary-strong:#0369a1;
   --good:#16a34a;
   --warn:#d97706;
@@ -47,12 +50,95 @@ st.markdown("""
   --purple:#7c3aed;
 }
 
-/* Make sure edit links are always visible */
+/* ================================
+   COMPONENTS WITH SHADOWS
+   ================================ */
+html, body, [data-testid="stAppViewContainer"] {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+
+.card{
+  position: relative;
+  padding: 20px;
+  margin-bottom: 22px;
+  background: linear-gradient(145deg, var(--card-grad1), var(--card-grad2));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.35),
+    0 2px 0 rgba(255,255,255,.02) inset,
+    0 -1px 0 rgba(255,255,255,.02) inset;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.45),
+    0 2px 0 rgba(255,255,255,.03) inset,
+    0 -1px 0 rgba(255,255,255,.03) inset;
+}
+
+.metric-box{
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.metric-box:hover{
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  transform: translateY(-1px);
+}
+.metric-value{ font-weight: 800; font-size: 26px; }
+.metric-label{ color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; letter-spacing:.2px;
+}
+.pill-on{ background: rgba(34,197,94,.15); color: var(--good); border:1px solid rgba(34,197,94,.35);}
+.pill-warn{ background: rgba(245,158,11,.15); color: var(--warn); border:1px solid rgba(245,158,11,.35);}
+.pill-bad{ background: rgba(239,68,68,.15); color: var(--bad); border:1px solid rgba(239,68,68,.35);}
+
+.caption{ color: var(--muted); font-size:12px; margin-top:6px; }
+
+hr.div{ border:none; border-top:1px solid var(--border); margin: 14px 0; }
+
+.tip{
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.tip:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.3); }
+
+.alert{
+  margin-top: 12px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  border:1px solid var(--border);
+  font-weight: 600; letter-spacing:.2px;
+}
+.alert-good{ background: rgba(34,197,94,.12); color: var(--good);}
+.alert-warn{ background: rgba(245,158,11,.12); color: var(--warn);}
+.alert-bad{ background: rgba(239,68,68,.12); color: var(--bad); }
+
+/* ================================
+   EDIT BUTTON ONLY
+   ================================ */
 .edit-text {
   position:absolute; right:16px; top:16px;
   color: var(--primary);
   font-weight:700; font-size:13px;
   cursor:pointer; text-decoration:underline;
+}
+[data-theme="light"] .edit-text {
+  color: #0ea5e9;   /* ensure visible in light mode */
 }
 </style>
 """, unsafe_allow_html=True)
