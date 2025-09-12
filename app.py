@@ -32,7 +32,13 @@ st.markdown("""
   --bad:#ef4444;
   --purple:#a78bfa;
 }
-
+/* Dark mode: keep as cyan link */
+.edit-text {
+  position:absolute; right:16px; top:16px;
+  color: var(--primary);
+  font-weight:700; font-size:13px;
+  cursor:pointer; text-decoration:underline;
+}
 /* Light mode overrides */
 [data-theme="light"] {
   --bg: #ffffff;
