@@ -13,118 +13,50 @@ st.set_page_config(page_title="Financial Dashboard", layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
-:root{
-  --bg: #0b1220;             /* app background */
-  --card: #0f172a;           /* card background (deep navy) */
+/* Default (dark mode) */
+:root, [data-theme="dark"] {
+  --bg: #0b1220;
+  --card: #0f172a;
   --card-grad1:#0f172a;
   --card-grad2:#111a2f;
-  --border:#1f2a44;          /* subtle border */
-  --text:#e5e7eb;            /* base text */
-  --muted:#93a4bf;           /* captions */
-  --primary:#22d3ee;         /* cyan/teal primary */
+  --border:#1f2a44;
+  --text:#e5e7eb;
+  --muted:#93a4bf;
+  --primary:#22d3ee;
   --primary-strong:#06b6d4;
-  --good:#22c55e;            /* green */
-  --warn:#f59e0b;            /* amber */
-  --bad:#ef4444;             /* red */
+  --good:#22c55e;
+  --warn:#f59e0b;
+  --bad:#ef4444;
   --purple:#a78bfa;
 }
 
-html, body, [data-testid="stAppViewContainer"] {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+/* Light mode overrides */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --card: #f9fafb;
+  --card-grad1:#f9fafb;
+  --card-grad2:#f3f4f6;
+  --border:#d1d5db;
+  --text:#111827;
+  --muted:#6b7280;
+  --primary:#0ea5e9;     /* brighter cyan for light */
+  --primary-strong:#0369a1;
+  --good:#16a34a;
+  --warn:#d97706;
+  --bad:#dc2626;
+  --purple:#7c3aed;
 }
 
-.card{
-  position: relative;
-  padding: 20px;
-  margin-bottom: 22px;
-  background: linear-gradient(145deg, var(--card-grad1), var(--card-grad2));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.35),
-    0 2px 0 rgba(255,255,255,.02) inset,
-    0 -1px 0 rgba(255,255,255,.02) inset;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.card:hover{
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 40px rgba(0,0,0,.45),
-    0 2px 0 rgba(255,255,255,.03) inset,
-    0 -1px 0 rgba(255,255,255,.03) inset;
-}
-
-.metric-box{
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  text-align: center;
-  transition: box-shadow .2s ease, transform .2s ease;
-}
-.metric-box:hover{
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  transform: translateY(-1px);
-}
-.metric-value{ font-weight: 800; font-size: 26px; }
-.metric-label{ color: var(--muted); font-size: 12px; margin-top: 2px;}
-
-.pill{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:4px 10px; border-radius: 999px;
-  font-size: 12px; font-weight: 700; letter-spacing:.2px;
-}
-.pill-on{ background: rgba(34,197,94,.15); color: var(--good); border:1px solid rgba(34,197,94,.35);}
-.pill-warn{ background: rgba(245,158,11,.15); color: var(--warn); border:1px solid rgba(245,158,11,.35);}
-.pill-bad{ background: rgba(239,68,68,.15); color: var(--bad); border:1px solid rgba(239,68,68,.35);}
-
-.edit-text{
+/* Make sure edit links are always visible */
+.edit-text {
   position:absolute; right:16px; top:16px;
-  color: var(--primary); font-weight:700; font-size:13px;
+  color: var(--primary);
+  font-weight:700; font-size:13px;
   cursor:pointer; text-decoration:underline;
 }
-
-.caption{ color: var(--muted); font-size:12px; margin-top:6px; }
-
-hr.div{ border:none; border-top:1px solid var(--border); margin: 14px 0;}
-
-/* ---- SCOPED progress bars ONLY inside the savings analysis card ---- */
-.sa .bar-wrap{ margin:8px 0 6px; }
-.sa .bar-label{ font-size:12px; color:var(--muted); margin-bottom:6px;}
-.sa .progress{ height:10px; background:#0c1323; border:1px solid var(--border); border-radius:8px; overflow:hidden;}
-.sa .progress > span{ display:block; height:100%; border-right: 1px solid rgba(255,255,255,.18); }
-.sa .bar-exp{ background: linear-gradient(90deg, rgba(239,68,68,.9), rgba(239,68,68,.6));}
-.sa .bar-ctr{ background: linear-gradient(90deg, rgba(245,158,11,.9), rgba(245,158,11,.6));}
-.sa .bar-sav{ background: linear-gradient(90deg, rgba(34,197,94,.9), rgba(34,197,94,.6));}
-
-/* Alerts */
-.alert{
-  margin-top: 12px;
-  border-radius: 10px;
-  padding: 12px 14px;
-  border:1px solid var(--border);
-  font-weight: 600; letter-spacing:.2px;
-}
-.alert-good{ background: rgba(34,197,94,.12); color: var(--good);}
-.alert-warn{ background: rgba(245,158,11,.12); color: var(--warn);}
-.alert-bad{ background: rgba(239,68,68,.12); color: var(--bad);}
-
-/* Tips */
-.tip{
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.tip:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.3);}
-
-/* Hide any native Streamlit progress bars (if any appear) */
-div[role="progressbar"]{ display:none !important; }
 </style>
 """, unsafe_allow_html=True)
+
 
 # -------------------------------------------------
 # First-load spinner
