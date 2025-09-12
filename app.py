@@ -31,7 +31,6 @@ st.markdown("""
   --warn:#f59e0b;
   --bad:#ef4444;
   --purple:#a78bfa;
-}
 /* Dark mode: keep as cyan link */
 .edit-text {
   position:absolute; right:16px; top:16px;
@@ -39,22 +38,25 @@ st.markdown("""
   font-weight:700; font-size:13px;
   cursor:pointer; text-decoration:underline;
 }
-/* Light mode overrides */
-[data-theme="light"] {
-  --bg: #ffffff;
-  --card: #f9fafb;
-  --card-grad1:#f9fafb;
-  --card-grad2:#f3f4f6;
-  --border:#d1d5db;
-  --text:#111827;
-  --muted:#6b7280;
-  --primary:#0ea5e9;     
-  --primary-strong:#0369a1;
-  --good:#16a34a;
-  --warn:#d97706;
-  --bad:#dc2626;
-  --purple:#7c3aed;
+
+/* Light mode: grey pill for visibility */
+[data-theme="light"] .edit-text {
+  color: #374151;                  /* dark grey text (Tailwind gray-700) */
+  background: #e5e7eb;             /* light grey background (gray-200) */
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;           /* cleaner, no underline */
+  border: 1px solid #d1d5db;       /* subtle border (gray-300) */
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6); /* inner lighter grey */
 }
+
+/* Hover effect: darker pill */
+[data-theme="light"] .edit-text:hover {
+  background: #d1d5db;             /* medium grey background (gray-300) */
+  color: #111827;                  /* almost black text (gray-900) */
+}
+
 
 /* ================================
    COMPONENTS WITH SHADOWS
