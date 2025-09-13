@@ -221,9 +221,21 @@ with st.container():
     on_track = projected >= goal_future
 
     mm = st.columns(3)
-    mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
-    mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
-    mm[2].markdown(f"<div class='metric-box'><div class='metric-value {'text-good' if on_track else 'text-bad'}">{'✅ On Track' if on_track else '⚠ Shortfall'}</div><div class='metric-label'>Status</div><div class='caption'>Projected vs inflated goal.</div></div>", unsafe_allow_html=True)
+mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
+mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
+
+status_class = "text-good" if on_track else "text-bad"
+status_text = "✅ On Track" if on_track else "⚠ Shortfall"
+
+mm[2].markdown(
+    f"<div class='metric-box'>"
+    f"<div class='metric-value {status_class}'>{status_text}</div>"
+    f"<div class='metric-label'>Status</div>"
+    f"<div class='caption'>Projected vs inflated goal.</div>"
+    f"</div>",
+    unsafe_allow_html=True,
+)
+
 
     fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
                                line=dict(color="#22c55e", width=3),
