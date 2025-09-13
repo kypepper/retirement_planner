@@ -182,14 +182,14 @@ with st.container():
 
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
       
-    # Summary metrics
-    m = st.columns(6)
-    m[0].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['age']}</div><div class='metric-label'>Age</div><div class='caption'>Your current age.</div></div>", unsafe_allow_html=True)
-    m[1].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--good)'>{currency(profile['income'])}</div><div class='metric-label'>Annual Income</div><div class='caption'>Before taxes.</div></div>", unsafe_allow_html=True)
-    m[2].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--purple)'>{currency(profile['cash']+profile['investments'])}</div><div class='metric-label'>Total Savings</div><div class='caption'>Cash + investments.</div></div>", unsafe_allow_html=True)
-    m[3].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--warn)'>{profile['annual_return']}%</div><div class='metric-label'>Expected Return</div><div class='caption'>Long-run average.</div></div>", unsafe_allow_html=True)
-    m[4].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['inflation']:.1f}%</div><div class='metric-label'>Inflation</div><div class='caption'>Assumed CPI per year.</div></div>", unsafe_allow_html=True)
-    m[5].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)
+   # Summary metrics
+   m = st.columns(6)
+   m[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['age']}</div><div class='metric-label'>Age</div><div class='caption'>Your current age.</div></div>", unsafe_allow_html=True)
+   m[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(profile['income'])}</div><div class='metric-label'>Annual Income</div><div class='caption'>Before taxes.</div></div>", unsafe_allow_html=True)
+   m[2].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(profile['cash']+profile['investments'])}</div><div class='metric-label'>Total Savings</div><div class='caption'>Cash + investments.</div></div>", unsafe_allow_html=True)
+   m[3].markdown(f"<div class='metric-box'><div class='metric-value text-warn'>{profile['annual_return']}%</div><div class='metric-label'>Expected Return</div><div class='caption'>Long-run average.</div></div>", unsafe_allow_html=True)
+   m[4].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['inflation']:.1f}%</div><div class='metric-label'>Inflation</div><div class='caption'>Assumed CPI per year.</div></div>", unsafe_allow_html=True)
+   m[5].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)tyle='color:var(--primary)'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)
    
     st.markdown(f"<span class='pill pill-on'>{profile['status'].capitalize()}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
