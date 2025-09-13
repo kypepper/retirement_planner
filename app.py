@@ -12,10 +12,21 @@ st.set_page_config(page_title="Financial Dashboard", layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
+:root {
+  --primary: #3b82f6;  /* blue */
+  --good: #10b981;     /* green */
+  --warn: #f59e0b;     /* orange */
+  --bad: #ef4444;      /* red */
+  --purple: #8b5cf6;   /* purple */
+  --card-grad1: #0f172a;
+  --card-grad2: #111827;
+  --border: #1f2937;
+}
+
 /* ================================
-   CARD + METRIC BOXES (restore shadows)
+   CARD + METRIC BOXES
    ================================ */
-.card{
+.card {
   position: relative;
   padding: 20px;
   margin-bottom: 22px;
@@ -28,7 +39,7 @@ st.markdown("""
     0 -1px 0 rgba(255,255,255,.02) inset;
   transition: transform .18s ease, box-shadow .18s ease;
 }
-.card:hover{
+.card:hover {
   transform: translateY(-2px);
   box-shadow:
     0 14px 40px rgba(0,0,0,.45),
@@ -36,7 +47,7 @@ st.markdown("""
     0 -1px 0 rgba(255,255,255,.03) inset;
 }
 
-.metric-box{
+.metric-box {
   background: rgba(255,255,255,.03);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -44,7 +55,7 @@ st.markdown("""
   text-align: center;
   transition: box-shadow .2s ease, transform .2s ease;
 }
-.metric-box:hover{
+.metric-box:hover {
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
   transform: translateY(-1px);
 }
@@ -54,10 +65,10 @@ st.markdown("""
 .tip { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
 
 /* ================================
-   EDIT / CLOSE BUTTONS (pill style)
+   EDIT / CLOSE BUTTONS
    ================================ */
 button[kind="secondary"] {
-  background: #374151;              /* dark grey for dark mode */
+  background: #374151;
   color: #f9fafb !important;
   border-radius: 6px;
   padding: 2px 10px;
@@ -67,7 +78,7 @@ button[kind="secondary"] {
   transition: background 0.2s ease;
 }
 [data-theme="light"] button[kind="secondary"] {
-  background: #e5e7eb;              /* light grey */
+  background: #e5e7eb;
   color: #111827 !important;
   border: 1px solid #d1d5db;
 }
@@ -78,11 +89,11 @@ button[kind="secondary"]:hover {
 /* ================================
    TEXT COLOR ACCENTS
    ================================ */
-.text-primary { color: var(--primary) !important; }   /* cyan/blue */
-.text-good    { color: var(--good) !important; }      /* green */
-.text-warn    { color: var(--warn) !important; }      /* orange */
-.text-bad     { color: var(--bad) !important; }       /* red */
-.text-purple  { color: var(--purple) !important; }    /* purple */
+.text-primary { color: var(--primary) !important; }
+.text-good    { color: var(--good) !important; }
+.text-warn    { color: var(--warn) !important; }
+.text-bad     { color: var(--bad) !important; }
+.text-purple  { color: var(--purple) !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -223,7 +234,6 @@ with st.container():
 
     status_class = "text-good" if on_track else "text-bad"
     status_text = "✅ On Track" if on_track else "⚠ Shortfall"
-
     mm[2].markdown(
         f"<div class='metric-box'>"
         f"<div class='metric-value {status_class}'>{status_text}</div>"
@@ -332,7 +342,8 @@ with right:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 5) EXPENSE BREAKDOWN & SCENARIOS
+# 5) EXPENSE BREAKDOWN
+# 6) 20-YEAR INVESTMENT SCENARIOS
 # =================================================
 b_left, b_right = st.columns(2)
 
