@@ -293,7 +293,7 @@ with left:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 4) MONTHLY EXPENSES (with text-button edit)
+# 4) MONTHLY EXPENSES
 # =================================================
 with right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -332,8 +332,7 @@ with right:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 5) EXPENSE BREAKDOWN (donut)
-# 6) 20-Year Investment Scenarios
+# 5) EXPENSE BREAKDOWN & SCENARIOS
 # =================================================
 b_left, b_right = st.columns(2)
 
