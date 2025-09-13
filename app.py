@@ -49,7 +49,7 @@ st.markdown("""
   transform: translateY(-1px);
 }
 
-/* Alerts, tips, pills remain the same */
+/* Alerts, tips, pills */
 .alert { border-radius: 10px; padding: 12px 14px; border:1px solid var(--border); }
 .tip { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
 
@@ -86,7 +86,6 @@ button[kind="secondary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-
 # -------------------------------------------------
 # First-load spinner
 # -------------------------------------------------
@@ -100,7 +99,6 @@ if "loaded" not in st.session_state:
     time.sleep(1.2)
     st.session_state["loaded"] = True
     st.rerun()
-
 
 # -------------------------------------------------
 # Session state (data + edit toggles)
@@ -181,16 +179,16 @@ with st.container():
                 st.success("Profile updated.")
 
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
-      
-   # Summary metrics
+
+    # Summary metrics
     m = st.columns(6)
     m[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['age']}</div><div class='metric-label'>Age</div><div class='caption'>Your current age.</div></div>", unsafe_allow_html=True)
     m[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(profile['income'])}</div><div class='metric-label'>Annual Income</div><div class='caption'>Before taxes.</div></div>", unsafe_allow_html=True)
     m[2].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(profile['cash']+profile['investments'])}</div><div class='metric-label'>Total Savings</div><div class='caption'>Cash + investments.</div></div>", unsafe_allow_html=True)
     m[3].markdown(f"<div class='metric-box'><div class='metric-value text-warn'>{profile['annual_return']}%</div><div class='metric-label'>Expected Return</div><div class='caption'>Long-run average.</div></div>", unsafe_allow_html=True)
     m[4].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['inflation']:.1f}%</div><div class='metric-label'>Inflation</div><div class='caption'>Assumed CPI per year.</div></div>", unsafe_allow_html=True)
-    m[5].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)tyle='color:var(--primary)'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)
-   
+    m[5].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)
+
     st.markdown(f"<span class='pill pill-on'>{profile['status'].capitalize()}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -210,7 +208,6 @@ with st.container():
 
     for age in years:
         years_since_now = age - profile['age']
-        # Grow contributions annually with salary growth (applied once per year)
         contrib_this_year = contrib0 * ((1 + salary_growth) ** max(0, years_since_now))
         if age < profile['retirement_age']:
             current = current*(1+annual_return) + contrib_this_year*12
@@ -220,14 +217,13 @@ with st.container():
 
     projected = balances[-1]
     years_to_ret = max(0, profile['retirement_age'] - profile['age'])
-    # Inflate the goal to retirement date (future dollars)
     goal_future = profile['retirement_goal'] * ((1 + profile['inflation']/100.0) ** years_to_ret)
     on_track = projected >= goal_future
 
     mm = st.columns(3)
-    mm[0].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
-    mm[1].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--purple)'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
-    mm[2].markdown(f"<div class='metric-box'><div class='metric-value'>{'✅ On Track' if on_track else '⚠ Shortfall'}</div><div class='metric-label'>Status</div><div class='caption'>Projected vs inflated goal.</div></div>", unsafe_allow_html=True)
+    mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
+    mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
+    mm[2].markdown(f"<div class='metric-box'><div class='metric-value {'text-good' if on_track else 'text-bad'}">{'✅ On Track' if on_track else '⚠ Shortfall'}</div><div class='metric-label'>Status</div><div class='caption'>Projected vs inflated goal.</div></div>", unsafe_allow_html=True)
 
     fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
                                line=dict(color="#22c55e", width=3),
@@ -249,7 +245,7 @@ with st.container():
 left, right = st.columns(2)
 
 with left:
-    st.markdown("<div class='card sa'>", unsafe_allow_html=True)  # <-- 'sa' scopes bars here only
+    st.markdown("<div class='card sa'>", unsafe_allow_html=True)
     st.subheader("Savings Analysis")
 
     monthly_income = profile['income']/12
@@ -258,24 +254,22 @@ with left:
     remaining = monthly_income - total_exp - contrib
     savings_rate = (remaining/monthly_income*100) if monthly_income > 0 else 0
 
-    # Status bucket & alert
     if savings_rate >= 20:
-        status_lbl = "🟢 Good"
+        status_lbl = "<span class='text-good'>🟢 Good</span>"
         alert_html = "<div class='alert alert-good'>Great job! You're on track with your savings rate.</div>"
     elif savings_rate >= 10:
-        status_lbl = "🟡 Fair"
+        status_lbl = "<span class='text-warn'>🟡 Fair</span>"
         alert_html = "<div class='alert alert-warn'>Consider increasing contributions to reach your long-term goals.</div>"
     else:
-        status_lbl = "🔴 Poor"
+        status_lbl = "<span class='text-bad'>🔴 Poor</span>"
         alert_html = "<div class='alert alert-bad'>Critical Action Needed: Reduce expenses or increase income.</div>"
 
-    st.markdown(f"<div class='metric-value' style='color:var(--purple)'>{savings_rate:.1f}%</div><div class='metric-label'>Savings Rate</div><div class='caption'>{status_lbl}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div><div class='metric-label'>Savings Rate</div><div class='caption'>{status_lbl}</div>", unsafe_allow_html=True)
     st.write(f"Monthly Income: {currency(monthly_income)}")
     st.write(f"Monthly Expenses: {currency(total_exp)}")
     st.write(f"Contributions: {currency(contrib)}")
     st.write(f"Remaining: {currency(remaining)}")
 
-    # Labeled progress bars (scoped)
     exp_share = (total_exp/monthly_income*100) if monthly_income else 0
     ctr_share = (contrib/monthly_income*100) if monthly_income else 0
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
@@ -318,7 +312,7 @@ with right:
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
 
     total_monthly = sum(expenses.values())
-    st.markdown(f"<div class='metric-value' style='color:var(--warn)'>{currency(total_monthly)}</div><div class='metric-label'>Total Monthly Expenses</div>", unsafe_allow_html=True)
+    st.markdown(f"<div class='metric-value text-warn'>{currency(total_monthly)}</div><div class='metric-label'>Total Monthly Expenses</div>", unsafe_allow_html=True)
 
     grid = st.columns(3)
     for i,(k,v) in enumerate(expenses.items()):
@@ -365,8 +359,8 @@ with b_right:
     sp = compound(principal, profile['monthly_contributions'], 20, 10)
 
     c = st.columns(2)
-    c[0].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{currency(hy)}</div><div class='metric-label'>High-Yield Savings</div><div class='caption'>Stable growth (~5% APY)</div></div>", unsafe_allow_html=True)
-    c[1].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--good)'>{currency(sp)}</div><div class='metric-label'>S&P 500 Index</div><div class='caption'>Market growth (~10% Avg.)</div></div>", unsafe_allow_html=True)
+    c[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(hy)}</div><div class='metric-label'>High-Yield Savings</div><div class='caption'>Stable growth (~5% APY)</div></div>", unsafe_allow_html=True)
+    c[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(sp)}</div><div class='metric-label'>S&P 500 Index</div><div class='caption'>Market growth (~10% Avg.)</div></div>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
