@@ -1,4 +1,3 @@
-# app.py
 import time
 import streamlit as st
 import plotly.graph_objects as go
@@ -78,10 +77,20 @@ button[kind="secondary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-    
+# -------------------------------------------------
+# First-load spinner
+# -------------------------------------------------
+if "loaded" not in st.session_state:
+    st.markdown(
+        "<div style='height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#93a4bf'>"
+        "<div style='font-size:40px'>🔄</div><div style='margin-top:8px'>Loading your financial data...</div>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
     time.sleep(1.2)
     st.session_state["loaded"] = True
     st.rerun()
+
 
 # -------------------------------------------------
 # Session state (data + edit toggles)
