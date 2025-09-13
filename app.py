@@ -110,9 +110,8 @@ if "profile" not in st.session_state:
         "monthly_contributions": 0, "annual_return": 5,
         "retirement_age": 80, "retirement_goal": 3500000,
         "social_security": 3000, "tax_rate": 22,
-        # NEW
-        "inflation": 2.5,          # % per year
-        "salary_growth": 3.0,      # % per year, used to grow contributions
+        "inflation": 2.5,
+        "salary_growth": 3.0,
     }
 
 if "expenses" not in st.session_state:
@@ -133,7 +132,7 @@ expenses = st.session_state.expenses
 def currency(x): return f"${x:,.0f}"
 
 # =================================================
-# 1) FINANCIAL PROFILE (with text-button edit)
+# 1) FINANCIAL PROFILE
 # =================================================
 with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -144,7 +143,6 @@ with st.container():
             st.session_state.edit_profile_open = not st.session_state.edit_profile_open
 
     if st.session_state.edit_profile_open:
-        # Inline dropdown-style edit area
         with st.form("profile_form", clear_on_submit=False):
             c1, c2, c3, c4 = st.columns(4)
             age   = c1.number_input("Age", value=profile["age"], min_value=0, max_value=120)
@@ -180,7 +178,6 @@ with st.container():
 
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
 
-    # Summary metrics
     m = st.columns(6)
     m[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['age']}</div><div class='metric-label'>Age</div><div class='caption'>Your current age.</div></div>", unsafe_allow_html=True)
     m[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(profile['income'])}</div><div class='metric-label'>Annual Income</div><div class='caption'>Before taxes.</div></div>", unsafe_allow_html=True)
@@ -193,7 +190,7 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 2) RETIREMENT PROJECTION (graph + status, inflation & salary growth aware)
+# 2) RETIREMENT PROJECTION
 # =================================================
 with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -221,21 +218,20 @@ with st.container():
     on_track = projected >= goal_future
 
     mm = st.columns(3)
-mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
-mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
+    mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
+    mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
 
-status_class = "text-good" if on_track else "text-bad"
-status_text = "✅ On Track" if on_track else "⚠ Shortfall"
+    status_class = "text-good" if on_track else "text-bad"
+    status_text = "✅ On Track" if on_track else "⚠ Shortfall"
 
-mm[2].markdown(
-    f"<div class='metric-box'>"
-    f"<div class='metric-value {status_class}'>{status_text}</div>"
-    f"<div class='metric-label'>Status</div>"
-    f"<div class='caption'>Projected vs inflated goal.</div>"
-    f"</div>",
-    unsafe_allow_html=True,
-)
-
+    mm[2].markdown(
+        f"<div class='metric-box'>"
+        f"<div class='metric-value {status_class}'>{status_text}</div>"
+        f"<div class='metric-label'>Status</div>"
+        f"<div class='caption'>Projected vs inflated goal.</div>"
+        f"</div>",
+        unsafe_allow_html=True,
+    )
 
     fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
                                line=dict(color="#22c55e", width=3),
@@ -252,7 +248,7 @@ mm[2].markdown(
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 3) SAVINGS ANALYSIS (scoped bars + dynamic alert)
+# 3) SAVINGS ANALYSIS
 # =================================================
 left, right = st.columns(2)
 
