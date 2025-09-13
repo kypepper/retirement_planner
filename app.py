@@ -78,7 +78,7 @@ button[kind="secondary"]:hover {
 </style>
 """, unsafe_allow_html=True)
 
-    )
+    
     time.sleep(1.2)
     st.session_state["loaded"] = True
     st.rerun()
