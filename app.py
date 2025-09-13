@@ -13,155 +13,36 @@ st.set_page_config(page_title="Financial Dashboard", layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
-/* ================================
-   COLOR VARIABLES
-   ================================ */
-/* Default (dark mode) */
-:root, [data-theme="dark"] {
-  --bg: #0b1220;
-  --card: #0f172a;
-  --card-grad1:#0f172a;
-  --card-grad2:#111a2f;
-  --border:#1f2a44;
-  --text:#e5e7eb;
-  --muted:#93a4bf;
-  --primary:#22d3ee;
-  --primary-strong:#06b6d4;
-  --good:#22c55e;
-  --warn:#f59e0b;
-  --bad:#ef4444;
-  --purple:#a78bfa;
-/* Dark mode: keep as cyan link */
-.edit-text {
-  position:absolute; right:16px; top:16px;
-  color: var(--primary);
-  font-weight:700; font-size:13px;
-  cursor:pointer; text-decoration:underline;
-}
+/* ======================================
+   EDIT / CLOSE BUTTONS (neutral pill style)
+   ====================================== */
 
-/* Light mode: grey pill for visibility */
-[data-theme="light"] .edit-text {
-  color: #374151;                  /* dark grey text (Tailwind gray-700) */
-  background: #e5e7eb;             /* light grey background (gray-200) */
-  padding: 2px 6px;
+/* Default style for buttons (applies to both dark/light) */
+button[kind="secondary"] {
+  background: #374151;              /* dark grey for dark mode */
+  color: #f9fafb !important;        /* light text */
   border-radius: 6px;
+  padding: 2px 10px;
   font-weight: 600;
-  text-decoration: none;           /* cleaner, no underline */
-  border: 1px solid #d1d5db;       /* subtle border (gray-300) */
-  box-shadow: inset 0 1px 1px rgba(255,255,255,0.6); /* inner lighter grey */
+  border: none;
+  text-decoration: none !important;
+  transition: background 0.2s ease;
 }
 
-/* Hover effect: darker pill */
-[data-theme="light"] .edit-text:hover {
-  background: #d1d5db;             /* medium grey background (gray-300) */
-  color: #111827;                  /* almost black text (gray-900) */
+/* Light mode override */
+[data-theme="light"] button[kind="secondary"] {
+  background: #e5e7eb;              /* light grey */
+  color: #111827 !important;        /* dark text */
+  border: 1px solid #d1d5db;
 }
 
-
-/* ================================
-   COMPONENTS WITH SHADOWS
-   ================================ */
-html, body, [data-testid="stAppViewContainer"] {
-  background: var(--bg);
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-}
-
-.card{
-  position: relative;
-  padding: 20px;
-  margin-bottom: 22px;
-  background: linear-gradient(145deg, var(--card-grad1), var(--card-grad2));
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.35),
-    0 2px 0 rgba(255,255,255,.02) inset,
-    0 -1px 0 rgba(255,255,255,.02) inset;
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.card:hover{
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 40px rgba(0,0,0,.45),
-    0 2px 0 rgba(255,255,255,.03) inset,
-    0 -1px 0 rgba(255,255,255,.03) inset;
-}
-
-.metric-box{
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  text-align: center;
-  transition: box-shadow .2s ease, transform .2s ease;
-}
-.metric-box:hover{
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  transform: translateY(-1px);
-}
-.metric-value{ font-weight: 800; font-size: 26px; }
-.metric-label{ color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-.pill{
-  display:inline-flex; align-items:center; gap:6px;
-  padding:4px 10px; border-radius: 999px;
-  font-size: 12px; font-weight: 700; letter-spacing:.2px;
-}
-.pill-on{ background: rgba(34,197,94,.15); color: var(--good); border:1px solid rgba(34,197,94,.35);}
-.pill-warn{ background: rgba(245,158,11,.15); color: var(--warn); border:1px solid rgba(245,158,11,.35);}
-.pill-bad{ background: rgba(239,68,68,.15); color: var(--bad); border:1px solid rgba(239,68,68,.35);}
-
-.caption{ color: var(--muted); font-size:12px; margin-top:6px; }
-
-hr.div{ border:none; border-top:1px solid var(--border); margin: 14px 0; }
-
-.tip{
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.tip:hover{ transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.3); }
-
-.alert{
-  margin-top: 12px;
-  border-radius: 10px;
-  padding: 12px 14px;
-  border:1px solid var(--border);
-  font-weight: 600; letter-spacing:.2px;
-}
-.alert-good{ background: rgba(34,197,94,.12); color: var(--good);}
-.alert-warn{ background: rgba(245,158,11,.12); color: var(--warn);}
-.alert-bad{ background: rgba(239,68,68,.12); color: var(--bad); }
-
-/* ================================
-   EDIT BUTTON ONLY
-   ================================ */
-/* Dark mode: keep as simple link */
-.edit-text {
-  position:absolute; right:16px; top:16px;
-  color: var(--primary);
-  font-weight:700; font-size:13px;
-  cursor:pointer; text-decoration:underline;
-}
-
-/* Light mode: make a pill for visibility */
-[data-theme="light"] .edit-text {
-  color: #0369a1;
-  background: rgba(3,105,161,0.08);
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-weight: 600;
-  text-decoration: none;
-}
-[data-theme="light"] .edit-text:hover {
-  background: #0369a1;
-  color: white;
+/* Hover effect */
+button[kind="secondary"]:hover {
+  filter: brightness(0.9);
 }
 </style>
 """, unsafe_allow_html=True)
+
 
 
 
