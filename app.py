@@ -13,14 +13,53 @@ st.set_page_config(page_title="Financial Dashboard", layout="wide")
 # -------------------------------------------------
 st.markdown("""
 <style>
-/* ======================================
-   EDIT / CLOSE BUTTONS (neutral pill style)
-   ====================================== */
+/* ================================
+   CARD + METRIC BOXES (restore shadows)
+   ================================ */
+.card{
+  position: relative;
+  padding: 20px;
+  margin-bottom: 22px;
+  background: linear-gradient(145deg, var(--card-grad1), var(--card-grad2));
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.35),
+    0 2px 0 rgba(255,255,255,.02) inset,
+    0 -1px 0 rgba(255,255,255,.02) inset;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.card:hover{
+  transform: translateY(-2px);
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.45),
+    0 2px 0 rgba(255,255,255,.03) inset,
+    0 -1px 0 rgba(255,255,255,.03) inset;
+}
 
-/* Default style for buttons (applies to both dark/light) */
+.metric-box{
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: center;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.metric-box:hover{
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  transform: translateY(-1px);
+}
+
+/* Alerts, tips, pills remain the same */
+.alert { border-radius: 10px; padding: 12px 14px; border:1px solid var(--border); }
+.tip { background: rgba(255,255,255,.03); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+
+/* ================================
+   EDIT / CLOSE BUTTONS (pill style)
+   ================================ */
 button[kind="secondary"] {
   background: #374151;              /* dark grey for dark mode */
-  color: #f9fafb !important;        /* light text */
+  color: #f9fafb !important;
   border-radius: 6px;
   padding: 2px 10px;
   font-weight: 600;
@@ -28,33 +67,17 @@ button[kind="secondary"] {
   text-decoration: none !important;
   transition: background 0.2s ease;
 }
-
-/* Light mode override */
 [data-theme="light"] button[kind="secondary"] {
   background: #e5e7eb;              /* light grey */
-  color: #111827 !important;        /* dark text */
+  color: #111827 !important;
   border: 1px solid #d1d5db;
 }
-
-/* Hover effect */
 button[kind="secondary"]:hover {
   filter: brightness(0.9);
 }
 </style>
 """, unsafe_allow_html=True)
 
-
-
-
-# -------------------------------------------------
-# First-load spinner
-# -------------------------------------------------
-if "loaded" not in st.session_state:
-    st.markdown(
-        "<div style='height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#93a4bf'>"
-        "<div style='font-size:40px'>🔄</div><div style='margin-top:8px'>Loading your financial data...</div>"
-        "</div>",
-        unsafe_allow_html=True,
     )
     time.sleep(1.2)
     st.session_state["loaded"] = True
