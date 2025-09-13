@@ -74,8 +74,18 @@ button[kind="secondary"] {
 button[kind="secondary"]:hover {
   filter: brightness(0.9);
 }
+
+/* ================================
+   TEXT COLOR ACCENTS
+   ================================ */
+.text-primary { color: var(--primary) !important; }   /* cyan/blue */
+.text-good    { color: var(--good) !important; }      /* green */
+.text-warn    { color: var(--warn) !important; }      /* orange */
+.text-bad     { color: var(--bad) !important; }       /* red */
+.text-purple  { color: var(--purple) !important; }    /* purple */
 </style>
 """, unsafe_allow_html=True)
+
 
 # -------------------------------------------------
 # First-load spinner
@@ -171,7 +181,7 @@ with st.container():
                 st.success("Profile updated.")
 
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
-
+      
     # Summary metrics
     m = st.columns(6)
     m[0].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['age']}</div><div class='metric-label'>Age</div><div class='caption'>Your current age.</div></div>", unsafe_allow_html=True)
@@ -180,7 +190,7 @@ with st.container():
     m[3].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--warn)'>{profile['annual_return']}%</div><div class='metric-label'>Expected Return</div><div class='caption'>Long-run average.</div></div>", unsafe_allow_html=True)
     m[4].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['inflation']:.1f}%</div><div class='metric-label'>Inflation</div><div class='caption'>Assumed CPI per year.</div></div>", unsafe_allow_html=True)
     m[5].markdown(f"<div class='metric-box'><div class='metric-value' style='color:var(--primary)'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div><div class='caption'>Grows contributions yearly.</div></div>", unsafe_allow_html=True)
-
+   
     st.markdown(f"<span class='pill pill-on'>{profile['status'].capitalize()}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
