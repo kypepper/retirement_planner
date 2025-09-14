@@ -328,4 +328,21 @@ with st.container():
     st.subheader("💡 Quick Tips")
 
     tips = [
-        ("Emergency Fund", "🎯", "Target 3–6 months of expenses in cash or high-y
+        ("Emergency Fund", "🎯", "Target 3–6 months of expenses in cash or high-yield savings."),
+        ("Increase Savings Rate", "📈", "Automate transfers and aim for 20%+ of income when possible."),
+        ("Review Regularly", "🔄", "Revisit your plan every 6 months and adjust for life changes.")
+    ]
+
+    cols = st.columns(3, gap="large")
+    for col, (title, icon, desc) in zip(cols, tips):
+        with col:
+            st.markdown(
+                f"<div class='tip-card'>"
+                f"<div style='font-weight:600; font-size:1.05rem;'>{icon} {title}</div>"
+                f"<div style='font-size:0.9rem; margin-top:6px; opacity:0.85;'>{desc}</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
