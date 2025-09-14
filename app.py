@@ -55,8 +55,8 @@ st.markdown("""
 }
 
 .caption {
-  font-size: 0.75rem;
-  opacity: 0.6;
+  font-size: 0.85rem;
+  opacity: 0.7;
   margin-top: 4px;
 }
 
@@ -239,7 +239,7 @@ with st.container():
                       paper_bgcolor="rgba(0,0,0,0)",
                       plot_bgcolor="rgba(0,0,0,0)",
                       font=dict(color="white"),
-                      height=320,
+                      height=400,
                       legend=dict(orientation="h", yanchor="bottom", y=1.02,
                                   xanchor="right", x=1))
     st.plotly_chart(fig, use_container_width=True)
