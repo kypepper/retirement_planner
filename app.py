@@ -367,7 +367,7 @@ with b_left:
     pie.update_layout(
     showlegend=True,
     legend=dict(
-        font=dict(size=14),     # ✅ Bigger legend text
+        font=dict(size=16),     # ✅ Bigger legend text
         itemsizing="constant"   # ✅ Keeps marker size consistent
     ),
     margin=dict(l=4, r=4, t=4, b=4),
