@@ -163,12 +163,13 @@ with st.container():
             r_age = c10.number_input("Retirement Age", value=int(profile["retirement_age"]), step=1)
             goal = c11.number_input("Retirement Goal", value=int(profile["retirement_goal"]), step=50000)
 
-            c12, c13 = st.columns(2)
+            # ✅ Now 3 columns for Inflation, Salary Growth, Cash Contribution %
+            c12, c13, c14 = st.columns(3)
             infl = c12.number_input("Inflation (%)", value=float(profile["inflation"]), step=0.1, format="%.1f")
             sal_g = c13.number_input("Salary Growth (%)", value=float(profile["salary_growth"]), step=0.1, format="%.1f")
-            cash_pct = c14.number_input("Cash Contrib (% of after-tax income)", 
-                            value=float(profile.get("cash_contrib_pct", 0.0)), 
-                            step=0.5, format="%.1f")
+            cash_pct = c14.number_input("Cash Contrib (% of after-tax income)",
+                                        value=float(profile.get("cash_contrib_pct", 0.0)),
+                                        step=0.5, format="%.1f")
 
             save = st.form_submit_button("💾 Save Changes")  # ✅ inside form
             if save:
