@@ -250,7 +250,7 @@ with st.container():
 # =================================================
 # 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
-left, right = st.columns([0.9, 1.1])
+left, spacer, right = st.columns([1, 0.05, 1]) 
 
 with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
