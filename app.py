@@ -242,12 +242,13 @@ with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📊 Savings Analysis")
 
-    monthly_income = profile['income']/12
+    monthly_income = profile['income'] / 12
     total_exp = sum(expenses.values())
     contrib = profile['monthly_contributions']
     remaining = monthly_income - total_exp - contrib
-    savings_rate = (remaining/monthly_income*100) if monthly_income > 0 else 0
+    savings_rate = (remaining / monthly_income * 100) if monthly_income > 0 else 0
 
+    # Status + alert
     if savings_rate >= 20:
         status_lbl = "<span class='text-good'>🟢 Good</span>"
         alert_html = "<div style='background:#064e3b;color:#a7f3d0;padding:10px;border-radius:10px;'>✅ Great job! You're on track with your savings rate.</div>"
@@ -258,32 +259,46 @@ with left:
         status_lbl = "<span class='text-bad'>🔴 Needs Improvement</span>"
         alert_html = "<div style='background:#7f1d1d;color:#fecaca;padding:10px;border-radius:10px;'>⚠ Critical Action Needed: Reduce expenses or increase income.</div>"
 
-    st.markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{savings_rate:.1f}%</div><div class='metric-label'>Savings Rate</div><div class='caption'>{status_lbl}</div></div>", unsafe_allow_html=True)
+    # Top metric
+    st.markdown(
+        f"<div class='metric-box'>"
+        f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div>"
+        f"<div class='metric-label'>Savings Rate</div>"
+        f"<div class='caption'>{status_lbl}</div>"
+        f"</div>",
+        unsafe_allow_html=True
+    )
 
+    # Breakdown values
     st.write(f"**Monthly Income:** {currency(monthly_income)}")
     st.write(f"**Monthly Expenses:** {currency(total_exp)}")
     st.write(f"**Contributions:** {currency(contrib)}")
     st.write(f"**Remaining:** {currency(remaining)}")
 
-    exp_share = (total_exp/monthly_income*100) if monthly_income else 0
-    ctr_share = (contrib/monthly_income*100) if monthly_income else 0
+    # Progress bars with cap
+    exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
+    ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
     for lbl, pct, color in [
-      ("Expenses", exp_share, "#ef4444"),
-      ("Contributions", ctr_share, "#3b82f6"),
-      ("Savings", sav_share, "#10b981")
-]:
-      bar_width = min(max(pct, 0), 100)  # ✅ cap between 0 and 100
-    st.markdown(
-        f"<div style='margin-top:8px;'>"
-        f"<b>{lbl}</b> — {pct:.1f}%"
-        f"<div style='height:10px;background:#374151;border-radius:6px;'>"
-        f"<div style='width:{bar_width:.1f}%;background:{color};height:10px;border-radius:6px;'></div>"
-        f"</div></div>",
-        unsafe_allow_html=True
-    )
+        ("Expenses", exp_share, "#ef4444"),
+        ("Contributions", ctr_share, "#3b82f6"),
+        ("Savings", sav_share, "#10b981")
+    ]:
+        bar_width = min(max(pct, 0), 100)  # ✅ cap between 0 and 100
+        st.markdown(
+            f"<div style='margin-top:8px;'>"
+            f"<b>{lbl}</b> — {pct:.1f}%"
+            f"<div style='height:10px;background:#374151;border-radius:6px;'>"
+            f"<div style='width:{bar_width:.1f}%;background:{color};height:10px;border-radius:6px;'></div>"
+            f"</div></div>",
+            unsafe_allow_html=True
+        )
 
+    # Status message block
+    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
+    st.markdown(alert_html, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -317,7 +332,7 @@ with right:
 
     grid = st.columns(3, gap="small")
     for i, (k, v) in enumerate(st.session_state.expenses.items()):
-        p = (v/total_monthly*100) if total_monthly else 0
+        p = (v / total_monthly * 100) if total_monthly else 0
         with grid[i % 3]:
             st.markdown(
                 f"<div class='metric-box' style='margin-bottom:18px;'>"
@@ -328,7 +343,7 @@ with right:
                 unsafe_allow_html=True
             )
 
-    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly * 12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
