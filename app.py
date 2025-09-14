@@ -279,45 +279,70 @@ with st.container():
 # =================================================
 # 3) SAVINGS ANALYSIS
 # =================================================
-left, right = st.columns(2)
-
-with left:
+with st.container():
     st.markdown("<div class='card sa'>", unsafe_allow_html=True)
     st.subheader("Savings Analysis")
 
-    monthly_income = profile['income']/12
-    total_exp = sum(expenses.values())
-    contrib = profile['monthly_contributions']
+    monthly_income = profile['income'] / 12 if profile['income'] else 0
+    total_exp = sum(expenses.values()) if expenses else 0
+    contrib = profile['monthly_contributions'] or 0
     remaining = monthly_income - total_exp - contrib
-    savings_rate = (remaining/monthly_income*100) if monthly_income > 0 else 0
+    savings_rate = (remaining / monthly_income * 100) if monthly_income > 0 else 0
 
+    # Status labels
     if savings_rate >= 20:
-        status_lbl = "<span class='text-good'>🟢 Good</span>"
-        alert_html = "<div class='alert alert-good'>Great job! You're on track with your savings rate.</div>"
+        status_lbl = "<span class='pill' style='background:#065f46;color:#d1fae5;padding:4px 10px;border-radius:12px;font-size:13px;'>🟢 Good</span>"
+        alert_html = "<div class='alert' style='background:rgba(16,185,129,.1);border-left:4px solid #10b981'>Great job! You're on track with your savings rate.</div>"
     elif savings_rate >= 10:
-        status_lbl = "<span class='text-warn'>🟡 Fair</span>"
-        alert_html = "<div class='alert alert-warn'>Consider increasing contributions to reach your long-term goals.</div>"
+        status_lbl = "<span class='pill' style='background:#78350f;color:#fef3c7;padding:4px 10px;border-radius:12px;font-size:13px;'>🟡 Fair</span>"
+        alert_html = "<div class='alert' style='background:rgba(245,158,11,.1);border-left:4px solid #f59e0b'>Consider increasing contributions to reach your long-term goals.</div>"
     else:
-        status_lbl = "<span class='text-bad'>🔴 Poor</span>"
-        alert_html = "<div class='alert alert-bad'>Critical Action Needed: Reduce expenses or increase income.</div>"
+        status_lbl = "<span class='pill' style='background:#7f1d1d;color:#fee2e2;padding:4px 10px;border-radius:12px;font-size:13px;'>🔴 Poor</span>"
+        alert_html = "<div class='alert' style='background:rgba(239,68,68,.1);border-left:4px solid #ef4444'>Critical Action Needed: Reduce expenses or increase income.</div>"
 
-    st.markdown(f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div><div class='metric-label'>Savings Rate</div><div class='caption'>{status_lbl}</div>", unsafe_allow_html=True)
-    st.write(f"Monthly Income: {currency(monthly_income)}")
-    st.write(f"Monthly Expenses: {currency(total_exp)}")
-    st.write(f"Contributions: {currency(contrib)}")
-    st.write(f"Remaining: {currency(remaining)}")
+    # Big metric
+    st.markdown(f"""
+        <div style="text-align:center;margin-bottom:12px">
+            <div style="font-size:42px;font-weight:700;color:#8b5cf6">{savings_rate:.1f}%</div>
+            <div style="font-size:15px;color:#9ca3af;margin-top:-4px">Savings Rate</div>
+            <div style="margin-top:6px">{status_lbl}</div>
+        </div>
+    """, unsafe_allow_html=True)
 
-    exp_share = (total_exp/monthly_income*100) if monthly_income else 0
-    ctr_share = (contrib/monthly_income*100) if monthly_income else 0
+    # Breakdown values
+    st.write(f"**Monthly Income:** {currency(monthly_income)}")
+    st.write(f"**Monthly Expenses:** {currency(total_exp)}")
+    st.write(f"**Investment Contributions:** {currency(contrib)}")
+    st.write(f"**Remaining:** {currency(remaining)}")
+
+    # Percent shares
+    exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
+    ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
-    for lbl, pct, klass in [
-        ("Expenses Share", exp_share, "bar-exp"),
-        ("Contributions Share", ctr_share, "bar-ctr"),
-        ("Savings Share", sav_share, "bar-sav")
-    ]:
-        st.markdown(f"<div class='bar-wrap'><div class='bar-label'>{lbl} — {pct:.1f}%</div><div class='progress'><span class='{klass}' style='width:{min(max(pct,0),100)}%'></span></div></div>", unsafe_allow_html=True)
+    # Custom progress bars
+    bar_html = """
+    <div style="margin-top:10px">
+        <div style="margin-bottom:6px;font-size:13px;color:#d1d5db">Expenses — {exp:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{exp:.1f}%;height:10px;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:6px"></div>
+        </div>
 
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Contributions — {ctr:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{ctr:.1f}%;height:10px;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:6px"></div>
+        </div>
+
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Savings — {sav:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{sav:.1f}%;height:10px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:6px"></div>
+        </div>
+    </div>
+    """.format(exp=exp_share, ctr=ctr_share, sav=sav_share)
+
+    st.markdown(bar_html, unsafe_allow_html=True)
+
+    # Alert box
     st.markdown(alert_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
