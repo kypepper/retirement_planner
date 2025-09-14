@@ -288,21 +288,28 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 3) SAVINGS ANALYSIS + 4) EXPENSES
+# 3) SAVINGS ANALYSIS
 # =================================================
-left, spacer, right = st.columns([0.9, 0.05, 1])
-
-with left:
+with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📊 Savings Analysis")
 
     monthly_income = profile['income'] / 12
     total_exp = sum(expenses.values())
-    contrib = profile['monthly_contributions']
-    remaining = monthly_income - total_exp - contrib
-    savings_rate = (remaining / monthly_income * 100) if monthly_income > 0 else 0
 
-    # Status + alert
+    # ✅ Contributions = fixed + % of after-tax income
+    fixed_contrib = profile['monthly_contributions']
+    after_tax_income = monthly_income * (1 - profile["tax_rate"]/100)
+    pct_contrib = after_tax_income * (profile.get("cash_contrib_pct", 0)/100)
+    contrib = fixed_contrib + pct_contrib
+
+    # ✅ Savings = contributions + leftover cash
+    leftover = max(0, monthly_income - total_exp - contrib)
+    savings = contrib + leftover
+
+    savings_rate = (savings / monthly_income * 100) if monthly_income > 0 else 0
+
+    # --- Status + alert ---
     if savings_rate >= 20:
         status_lbl = "<span class='text-good'>🟢 Good</span>"
         alert_html = "<div style='background:#064e3b;color:#a7f3d0;padding:10px;border-radius:10px;'>✅ Great job! You're on track with your savings rate.</div>"
@@ -313,7 +320,7 @@ with left:
         status_lbl = "<span class='text-bad'>🔴 Needs Improvement</span>"
         alert_html = "<div style='background:#7f1d1d;color:#fecaca;padding:10px;border-radius:10px;'>⚠ Critical Action Needed: Reduce expenses or increase income.</div>"
 
-    # Top metric
+    # --- Top metric ---
     st.markdown(
         f"<div class='metric-box'>"
         f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div>"
@@ -323,23 +330,23 @@ with left:
         unsafe_allow_html=True
     )
 
-    # Breakdown values
+    # --- Breakdown values ---
     st.write(f"**Monthly Income:** {currency(monthly_income)}")
     st.write(f"**Monthly Expenses:** {currency(total_exp)}")
-    st.write(f"**Contributions:** {currency(contrib)}")
-    st.write(f"**Remaining:** {currency(remaining)}")
+    st.write(f"**Contributions (Fixed + %):** {currency(contrib)}")
+    st.write(f"**Leftover Savings:** {currency(leftover)}")
 
-    # Progress bars with cap
+    # --- Progress bars with cap ---
     exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
     ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
-    sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
+    sav_share = (leftover / monthly_income * 100) if monthly_income else 0
 
     for lbl, pct, color in [
         ("Expenses", exp_share, "#ef4444"),
         ("Contributions", ctr_share, "#3b82f6"),
-        ("Savings", sav_share, "#10b981")
+        ("Leftover Savings", sav_share, "#10b981")
     ]:
-        bar_width = min(max(pct, 0), 100)  # ✅ cap between 0 and 100
+        bar_width = min(max(pct, 0), 100)
         st.markdown(
             f"<div style='margin-top:8px;'>"
             f"<b>{lbl}</b> — {pct:.1f}%"
@@ -349,55 +356,9 @@ with left:
             unsafe_allow_html=True
         )
 
-    # Status message block
+    # --- Status message block ---
     st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
     st.markdown(alert_html, unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with right:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-    header_l, header_r = st.columns([0.8, 0.2])
-    with header_l:
-        st.subheader("💰 Monthly Expenses")
-    with header_r:
-        if st.button("✏️ Edit" if not st.session_state.edit_expenses_open else "❌ Close", key="edit_expenses_btn"):
-            st.session_state.edit_expenses_open = not st.session_state.edit_expenses_open
-            st.rerun()
-
-    if st.session_state.edit_expenses_open:
-        with st.form("expenses_form", clear_on_submit=False):
-            new = {}
-            cols = st.columns(3)
-            for i, (k, v) in enumerate(expenses.items()):
-                with cols[i % 3]:
-                    new[k] = st.number_input(k, value=v, step=25, min_value=0)
-            if st.form_submit_button("💾 Save Changes"):
-                st.session_state.expenses = new
-                st.session_state.edit_expenses_open = False
-                st.rerun()
-
-    total_monthly = sum(st.session_state.expenses.values())
-    st.markdown(
-        f"<div class='metric-value text-warn'>{currency(total_monthly)}</div>"
-        f"<div class='metric-label'>Total Monthly Expenses</div>",
-        unsafe_allow_html=True
-    )
-
-    grid = st.columns(3, gap="small")
-    for i, (k, v) in enumerate(st.session_state.expenses.items()):
-        p = (v / total_monthly * 100) if total_monthly else 0
-        with grid[i % 3]:
-            st.markdown(
-                f"<div class='metric-box' style='margin-bottom:18px;'>"
-                f"<div class='metric-value'>{currency(v)}</div>"
-                f"<div class='metric-label'>{k}</div>"
-                f"<div class='caption'>{p:.1f}% of total</div>"
-                f"</div>",
-                unsafe_allow_html=True
-            )
-
-    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly * 12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
