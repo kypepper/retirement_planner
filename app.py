@@ -222,10 +222,10 @@ with st.container():
         else:
             current = current*(1+annual_return)
         balances.append(current)
-
-    projected = balances[-1]
-    years_to_ret = max(0, profile['retirement_age'] - profile['age'])
-    goal_future = profile['retirement_goal'] * ((1 + profile['inflation']/100.0) ** years_to_ret)
+      
+    # Balance at retirement age (instead of final age 90)
+    ret_index = profile['retirement_age'] - profile['age']
+    projected = balances[ret_index] if 0 <= ret_index < len(balances) else balances[-1]
     on_track = projected >= goal_future
 
     mm = st.columns(3)
@@ -246,6 +246,16 @@ with st.container():
     fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
                                line=dict(color="#22c55e", width=3),
                                name="Projected Balance"))
+    # Add a marker at retirement age
+    fig.add_scatter(
+        x=[profile['retirement_age']],
+        y=[projected],
+        mode="markers+text",
+        marker=dict(size=10, color="yellow"),
+        text=["Retirement"],
+        textposition="top center",
+        name="Retirement Age"
+    )
     fig.add_hline(y=goal_future, line_dash="dash", line_color="#22d3ee",
                   annotation_text="Inflation-Adjusted Goal", annotation_position="top left")
     fig.update_layout(margin=dict(l=8,r=8,t=8,b=8),
