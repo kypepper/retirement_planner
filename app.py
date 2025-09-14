@@ -270,11 +270,11 @@ with left:
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
     for lbl, pct, color in [
-    ("Expenses", exp_share, "#ef4444"),
-    ("Contributions", ctr_share, "#3b82f6"),
-    ("Savings", sav_share, "#10b981")
+      ("Expenses", exp_share, "#ef4444"),
+      ("Contributions", ctr_share, "#3b82f6"),
+      ("Savings", sav_share, "#10b981")
 ]:
-    bar_width = min(max(pct, 0), 100)  # ✅ cap between 0 and 100
+      bar_width = min(max(pct, 0), 100)  # ✅ cap between 0 and 100
     st.markdown(
         f"<div style='margin-top:8px;'>"
         f"<b>{lbl}</b> — {pct:.1f}%"
