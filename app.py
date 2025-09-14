@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 st.set_page_config(page_title="Financial Dashboard", layout="wide")
 
 # -------------------------------------------------
-# CSS — unified palette + card polish + scoped bars
+# CSS Styling
 # -------------------------------------------------
 st.markdown("""
 <style>
@@ -23,77 +23,43 @@ st.markdown("""
   --border: #1f2937;
 }
 
-/* ================================
-   CARD + METRIC BOXES
-   ================================ */
 .card {
-  position: relative;
-  padding: 20px;
-  margin-bottom: 22px;
   background: linear-gradient(145deg, var(--card-grad1), var(--card-grad2));
   border: 1px solid var(--border);
   border-radius: 14px;
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.35),
-    0 2px 0 rgba(255,255,255,.02) inset,
-    0 -1px 0 rgba(255,255,255,.02) inset;
-  transition: transform .18s ease, box-shadow .18s ease;
+  padding: 20px;
+  margin-bottom: 22px;
 }
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 14px 40px rgba(0,0,0,.45),
-    0 2px 0 rgba(255,255,255,.03) inset,
-    0 -1px 0 rgba(255,255,255,.03) inset;
-}
+
 .metric-box {
   background: rgba(255,255,255,.03);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 14px 16px;
+  padding: 16px;
   text-align: center;
-  transition: box-shadow .2s ease, transform .2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 140px;  /* ✅ Uniform sizing */
 }
-.metric-box:hover {
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  transform: translateY(-1px);
+
+.metric-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 4px;
 }
-/* Alerts, tips, pills */
-.alert {
-  border-radius: 10px;
-  padding: 12px 14px;
-  border:1px solid var(--border);
+
+.metric-label {
+  font-size: 0.9rem;
+  opacity: 0.85;
 }
-.tip {
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
+
+.caption {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  margin-top: 4px;
 }
-/* ================================
-   EDIT / CLOSE BUTTONS
-   ================================ */
-button[kind="secondary"] {
-  background: #374151;
-  color: #f9fafb !important;
-  border-radius: 6px;
-  padding: 2px 10px;
-  font-weight: 600;
-  border: none;
-  text-decoration: none !important;
-  transition: background 0.2s ease;
-}
-[data-theme="light"] button[kind="secondary"] {
-  background: #e5e7eb;
-  color: #111827 !important;
-  border: 1px solid #d1d5db;
-}
-button[kind="secondary"]:hover {
-  filter: brightness(0.9);
-}
-/* ================================
-   TEXT COLOR ACCENTS
-   ================================ */
+
 .text-primary { color: var(--primary) !important; }
 .text-good    { color: var(--good) !important; }
 .text-warn    { color: var(--warn) !important; }
@@ -101,6 +67,7 @@ button[kind="secondary"]:hover {
 .text-purple  { color: var(--purple) !important; }
 </style>
 """, unsafe_allow_html=True)
+
 
 # -------------------------------------------------
 # First-load spinner
@@ -135,15 +102,11 @@ if "expenses" not in st.session_state:
         "Donations": 100, "Emergency Fund": 400,
     }
 
-if "edit_profile_open" not in st.session_state:
-    st.session_state.edit_profile_open = False
-if "edit_expenses_open" not in st.session_state:
-    st.session_state.edit_expenses_open = False
-
 profile = st.session_state.profile
 expenses = st.session_state.expenses
 
 def currency(x): return f"${x:,.0f}"
+
 
 # =================================================
 # 1) FINANCIAL PROFILE
@@ -284,35 +247,24 @@ with st.container():
 
 
 # =================================================
-# 3) SAVINGS ANALYSIS
+# 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
 left, right = st.columns(2)
 
 with left:
-    st.markdown("<div class='card sa'>", unsafe_allow_html=True)
-    st.subheader("Savings Analysis")
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("📊 Savings Analysis")
 
-    monthly_income = profile['income'] / 12
+    monthly_income = profile['income']/12
     total_exp = sum(expenses.values())
     contrib = profile['monthly_contributions']
     remaining = monthly_income - total_exp - contrib
-
-    savings_rate = (remaining / monthly_income * 100) if monthly_income > 0 else 0
-
-    if savings_rate >= 20:
-        status_lbl = "<span class='text-good'>🟢 Good</span>"
-        alert_html = "<div class='alert alert-good'>Great job! You're on track with your savings rate.</div>"
-    elif savings_rate >= 10:
-        status_lbl = "<span class='text-warn'>🟡 Fair</span>"
-        alert_html = "<div class='alert alert-warn'>Consider increasing contributions to reach your long-term goals.</div>"
-    else:
-        status_lbl = "<span class='text-bad'>🔴 Poor</span>"
-        alert_html = "<div class='alert alert-bad'>Critical Action Needed: Reduce expenses or increase income.</div>"
+    savings_rate = (remaining/monthly_income*100) if monthly_income > 0 else 0
 
     st.markdown(
+        f"<div class='metric-box'>"
         f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div>"
-        f"<div class='metric-label'>Savings Rate</div>"
-        f"<div class='caption'>{status_lbl}</div>",
+        f"<div class='metric-label'>Savings Rate</div></div>",
         unsafe_allow_html=True
     )
 
@@ -321,62 +273,18 @@ with left:
     st.write(f"Contributions: {currency(contrib)}")
     st.write(f"Remaining: {currency(remaining)}")
 
-    exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
-    ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
-    sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
-
-    for lbl, pct, klass in [
-        ("Expenses Share", exp_share, "bar-exp"),
-        ("Contributions Share", ctr_share, "bar-ctr"),
-        ("Savings Share", sav_share, "bar-sav")
-    ]:
-        st.markdown(
-            f"<div class='bar-wrap'><div class='bar-label'>{lbl} — {pct:.1f}%</div>"
-            f"<div class='progress'><span class='{klass}' style='width:{min(max(pct,0),100)}%'></span></div></div>",
-            unsafe_allow_html=True
-        )
-
-    st.markdown(alert_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# =================================================
-# 4) MONTHLY EXPENSES
-# =================================================
 with right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    header_l, header_r = st.columns([0.8, 0.2])
+    st.subheader("💰 Monthly Expenses")
 
-    with header_l:
-        st.subheader("Monthly Expenses")
-    with header_r:
-        if st.button(("Close" if st.session_state.edit_expenses_open else "Edit"), key="edit_expenses_txt"):
-            st.session_state.edit_expenses_open = not st.session_state.edit_expenses_open
-
-    if st.session_state.edit_expenses_open:
-        with st.form("expenses_form", clear_on_submit=False):
-            new = {}
-            c1, c2, c3 = st.columns(3)
-            keys = list(expenses.keys())
-            for i, k in enumerate(keys):
-                col = [c1, c2, c3][i % 3]
-                with col:
-                    new[k] = st.number_input(k, value=expenses[k], step=25, min_value=0)
-            if st.form_submit_button("💾 Save Changes"):
-                st.session_state.expenses = new
-                expenses = new
-                st.success("Expenses updated.")
-
-    st.markdown("<hr class='div'/>", unsafe_allow_html=True)
     total_monthly = sum(expenses.values())
-    st.markdown(
-        f"<div class='metric-value text-warn'>{currency(total_monthly)}</div>"
-        f"<div class='metric-label'>Total Monthly Expenses</div>",
-        unsafe_allow_html=True
-    )
+    st.markdown(f"<div class='metric-value text-warn'>{currency(total_monthly)}</div><div class='metric-label'>Total Monthly Expenses</div>", unsafe_allow_html=True)
 
-    grid = st.columns(3)
+    grid = st.columns(3, gap="large")
     for i, (k, v) in enumerate(expenses.items()):
-        p = (v / total_monthly * 100) if total_monthly else 0
+        p = (v/total_monthly*100) if total_monthly else 0
         with grid[i % 3]:
             st.markdown(
                 f"<div class='metric-box'><div class='metric-value'>{currency(v)}</div>"
@@ -384,24 +292,22 @@ with right:
                 unsafe_allow_html=True
             )
 
-    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly * 12)}</span>", unsafe_allow_html=True)
+    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+
 # =================================================
-# 5) EXPENSE BREAKDOWN
+# 5) EXPENSE BREAKDOWN + 6) 20-YEAR INVESTMENT SCENARIOS
 # =================================================
 b_left, b_right = st.columns(2)
 
 with b_left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Expense Breakdown")
+    st.subheader("📉 Expense Breakdown")
 
     labels, values = list(expenses.keys()), list(expenses.values())
     pie = go.Figure(go.Pie(
-        labels=labels,
-        values=values,
-        hole=0.55,
-        sort=False,
+        labels=labels, values=values, hole=0.55, sort=False,
         hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
     ))
     pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
@@ -410,31 +316,32 @@ with b_left:
     st.plotly_chart(pie, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# =================================================
-# 6) 20-YEAR INVESTMENT SCENARIOS
-# =================================================
 with b_right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("20-Year Investment Scenarios")
+    st.subheader("📈 20-Year Investment Scenarios")
 
     def compound(principal, monthly, years, annual_pct):
-        r = (annual_pct / 100) / 12
-        n = years * 12
-        return principal * (1 + r) ** n + (monthly * ((1 + r) ** n - 1) / r if r else monthly * n)
+        r = (annual_pct/100)/12
+        n = years*12
+        return principal*(1+r)**n + (monthly*((1+r)**n - 1)/r if r else monthly*n)
 
     principal = profile['cash'] + profile['investments']
     hy = compound(principal, profile['monthly_contributions'], 20, 5)
     sp = compound(principal, profile['monthly_contributions'], 20, 10)
 
-    c = st.columns(2)
+    c = st.columns(2, gap="large")
     c[0].markdown(
-        f"<div class='metric-box'><div class='metric-value text-primary'>{currency(hy)}</div>"
-        f"<div class='metric-label'>High-Yield Savings</div><div class='caption'>Stable growth (~5% APY)</div></div>",
+        f"<div class='metric-box'><div class='metric-label'>High-Yield Savings</div>"
+        f"<div class='caption'>Stable Growth (5% APY)</div>"
+        f"<div class='metric-value text-primary'>{currency(hy)}</div>"
+        f"<div class='caption'>Projected balance in 20 years.</div></div>",
         unsafe_allow_html=True
     )
     c[1].markdown(
-        f"<div class='metric-box'><div class='metric-value text-good'>{currency(sp)}</div>"
-        f"<div class='metric-label'>S&P 500 Index</div><div class='caption'>Market growth (~10% Avg.)</div></div>",
+        f"<div class='metric-box'><div class='metric-label'>S&P 500 Index Fund</div>"
+        f"<div class='caption'>Market Growth (10% Avg. APY)</div>"
+        f"<div class='metric-value text-good'>{currency(sp)}</div>"
+        f"<div class='caption'>Projected balance in 20 years.</div></div>",
         unsafe_allow_html=True
     )
 
