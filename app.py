@@ -276,10 +276,15 @@ with st.container():
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 # =================================================
-# 3) SAVINGS ANALYSIS
+# 3, 4 & 5) SAVINGS ANALYSIS + MONTHLY EXPENSES + EXPENSE BREAKDOWN
 # =================================================
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
+top_left, top_right = st.columns([1, 1])  # Savings left, Expenses+Pie right
+
+# =========================
+# Savings Analysis
+# =========================
+with top_left:
+    st.markdown("<div class='card sa'>", unsafe_allow_html=True)
     st.subheader("Savings Analysis")
 
     monthly_income = profile['income'] / 12 if profile['income'] else 0
@@ -320,107 +325,82 @@ with st.container():
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
     # Gradient progress bars
-    bar_html = """
+    bar_html = f"""
     <div style="margin-top:10px">
-        <div style="margin-bottom:6px;font-size:13px;color:#d1d5db">Expenses — {exp:.1f}%</div>
+        <div style="margin-bottom:6px;font-size:13px;color:#d1d5db">Expenses — {exp_share:.1f}%</div>
         <div style="height:10px;border-radius:6px;background:#1f2937">
-            <div style="width:{exp:.1f}%;height:10px;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:6px"></div>
+            <div style="width:{exp_share:.1f}%;height:10px;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:6px"></div>
         </div>
 
-        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Contributions — {ctr:.1f}%</div>
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Contributions — {ctr_share:.1f}%</div>
         <div style="height:10px;border-radius:6px;background:#1f2937">
-            <div style="width:{ctr:.1f}%;height:10px;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:6px"></div>
+            <div style="width:{ctr_share:.1f}%;height:10px;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:6px"></div>
         </div>
 
-        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Savings — {sav:.1f}%</div>
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Savings — {sav_share:.1f}%</div>
         <div style="height:10px;border-radius:6px;background:#1f2937">
-            <div style="width:{sav:.1f}%;height:10px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:6px"></div>
+            <div style="width:{sav_share:.1f}%;height:10px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:6px"></div>
         </div>
     </div>
-    """.format(exp=exp_share, ctr=ctr_share, sav=sav_share)
-
+    """
     st.markdown(bar_html, unsafe_allow_html=True)
 
     # Alert box
     st.markdown(alert_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+# =========================
+# Monthly Expenses + Pie
+# =========================
+with top_right:
+    left, right = st.columns([1.2, 1])  # bigger left for expense grid
 
-# =================================================
-# 4) MONTHLY EXPENSES
-# =================================================
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Monthly Expenses")
+    with left:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Monthly Expenses")
 
-    total_monthly = sum(expenses.values()) if expenses else 0
+        total_monthly = sum(expenses.values()) if expenses else 0
 
-    # Total at top (yellow highlight)
-    st.markdown(f"""
-        <div style="text-align:center;margin-bottom:18px">
-            <div style="font-size:36px;font-weight:700;color:#facc15">{currency(total_monthly)}</div>
-            <div style="font-size:15px;color:#9ca3af">Total Monthly Expenses</div>
-        </div>
-    """, unsafe_allow_html=True)
+        st.markdown(f"""
+            <div style="text-align:center;margin-bottom:18px">
+                <div style="font-size:36px;font-weight:700;color:#facc15">{currency(total_monthly)}</div>
+                <div style="font-size:15px;color:#9ca3af">Total Monthly Expenses</div>
+            </div>
+        """, unsafe_allow_html=True)
 
-    # Grid layout for expense tiles
-    grid = st.columns(3)
-    icons = ["🏠","💡","🍔","✈️","🛡️","🎬","🎨","🎁","⚡"]
-    for i, (k, v) in enumerate(expenses.items()):
-        p = (v / total_monthly * 100) if total_monthly else 0
-        with grid[i % 3]:
-            st.markdown(f"""
-                <div class='metric-box'>
-                    <div style="font-size:20px;margin-bottom:4px">{icons[i % len(icons)]}</div>
-                    <div class='metric-value'>{currency(v)}</div>
-                    <div class='metric-label'>{k}</div>
-                    <div class='caption'>{p:.1f}% of total</div>
-                </div>
-            """, unsafe_allow_html=True)
+        # Expense grid with icons
+        grid = st.columns(3)
+        icons = ["🏠","💡","🍔","✈️","🛡️","🎬","🎨","🎁","⚡"]
+        for i, (k, v) in enumerate(expenses.items()):
+            p = (v / total_monthly * 100) if total_monthly else 0
+            with grid[i % 3]:
+                st.markdown(f"""
+                    <div class='metric-box'>
+                        <div style="font-size:20px;margin-bottom:4px">{icons[i % len(icons)]}</div>
+                        <div class='metric-value'>{currency(v)}</div>
+                        <div class='metric-label'>{k}</div>
+                        <div class='caption'>{p:.1f}% of total</div>
+                    </div>
+                """, unsafe_allow_html=True)
 
-    # Annual summary pill
-    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# =================================================
-# 5) EXPENSE BREAKDOWN
-# 6) 20-YEAR INVESTMENT SCENARIOS
-# =================================================
-b_left, b_right = st.columns(2)
-
-with b_left:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Expense Breakdown")
-    labels, values = list(expenses.keys()), list(expenses.values())
-    pie = go.Figure(go.Pie(
-        labels=labels, values=values, hole=0.55, sort=False,
-        hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
-    ))
-    pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
-    pie.update_layout(showlegend=True,
-                      legend=dict(font=dict(color="white")),
-                      margin=dict(l=4,r=4,t=4,b=4),
-                      paper_bgcolor="rgba(0,0,0,0)")
-    st.plotly_chart(pie, use_container_width=True)
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with b_right:
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("20-Year Investment Scenarios")
-
-    def compound(principal, monthly, years, annual_pct):
-        r = (annual_pct/100)/12
-        n = years*12
-        return principal*(1+r)**n + (monthly*((1+r)**n - 1)/r if r else monthly*n)
-
-    principal = profile['cash'] + profile['investments']
-    hy = compound(principal, profile['monthly_contributions'], 20, 5)
-    sp = compound(principal, profile['monthly_contributions'], 20, 10)
-
-    c = st.columns(2)
-    c[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(hy)}</div><div class='metric-label'>High-Yield Savings</div><div class='caption'>Stable growth (~5% APY)</div></div>", unsafe_allow_html=True)
-    c[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(sp)}</div><div class='metric-label'>S&P 500 Index</div><div class='caption'>Market growth (~10% Avg.)</div></div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+    with right:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Expense Breakdown")
+        labels, values = list(expenses.keys()), list(expenses.values())
+        pie = go.Figure(go.Pie(
+            labels=labels, values=values, hole=0.55, sort=False,
+            hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
+        ))
+        pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
+        pie.update_layout(showlegend=True,
+                          legend=dict(font=dict(color="white")),
+                          margin=dict(l=4,r=4,t=4,b=4),
+                          paper_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(pie, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
 # 7) QUICK TIPS
