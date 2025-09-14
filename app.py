@@ -279,7 +279,7 @@ with st.container():
 # 3) SAVINGS ANALYSIS
 # =================================================
 with st.container():
-    st.markdown("<div class='card sa'>", unsafe_allow_html=True)
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Savings Analysis")
 
     monthly_income = profile['income'] / 12 if profile['income'] else 0
@@ -319,7 +319,7 @@ with st.container():
     ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
-    # Custom progress bars
+    # Gradient progress bars
     bar_html = """
     <div style="margin-top:10px">
         <div style="margin-bottom:6px;font-size:13px;color:#d1d5db">Expenses — {exp:.1f}%</div>
@@ -351,40 +351,36 @@ with st.container():
 # =================================================
 with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    header_l, header_r = st.columns([0.8,0.2])
-    with header_l: st.subheader("Monthly Expenses")
-    with header_r:
-        if st.button(("Close" if st.session_state.edit_expenses_open else "Edit"), key="edit_expenses_txt"):
-            st.session_state.edit_expenses_open = not st.session_state.edit_expenses_open
-
-    if st.session_state.edit_expenses_open:
-        with st.form("expenses_form", clear_on_submit=False):
-            new = {}
-            c1, c2, c3 = st.columns(3)
-            keys = list(expenses.keys())
-            for i, k in enumerate(keys):
-                col = [c1, c2, c3][i % 3]
-                with col:
-                    new[k] = st.number_input(k, value=expenses[k], step=25, min_value=0)
-            if st.form_submit_button("💾 Save Changes"):
-                st.session_state.expenses = new
-                expenses = new
-                st.success("Expenses updated.")
-
-        st.markdown("<hr class='div'/>", unsafe_allow_html=True)
+    st.subheader("Monthly Expenses")
 
     total_monthly = sum(expenses.values()) if expenses else 0
-    st.markdown(f"<div class='metric-value text-warn'>{currency(total_monthly)}</div><div class='metric-label'>Total Monthly Expenses</div>", unsafe_allow_html=True)
 
+    # Total at top (yellow highlight)
+    st.markdown(f"""
+        <div style="text-align:center;margin-bottom:18px">
+            <div style="font-size:36px;font-weight:700;color:#facc15">{currency(total_monthly)}</div>
+            <div style="font-size:15px;color:#9ca3af">Total Monthly Expenses</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Grid layout for expense tiles
     grid = st.columns(3)
+    icons = ["🏠","💡","🍔","✈️","🛡️","🎬","🎨","🎁","⚡"]
     for i, (k, v) in enumerate(expenses.items()):
         p = (v / total_monthly * 100) if total_monthly else 0
         with grid[i % 3]:
-            st.markdown(f"<div class='metric-box'><div class='metric-value'>{currency(v)}</div><div class='metric-label'>{k}</div><div class='caption'>{p:.1f}% of total</div></div>", unsafe_allow_html=True)
+            st.markdown(f"""
+                <div class='metric-box'>
+                    <div style="font-size:20px;margin-bottom:4px">{icons[i % len(icons)]}</div>
+                    <div class='metric-value'>{currency(v)}</div>
+                    <div class='metric-label'>{k}</div>
+                    <div class='caption'>{p:.1f}% of total</div>
+                </div>
+            """, unsafe_allow_html=True)
 
+    # Annual summary pill
     st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 # =================================================
 # 5) EXPENSE BREAKDOWN
