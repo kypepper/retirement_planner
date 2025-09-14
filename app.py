@@ -279,6 +279,133 @@ with st.container():
 # 3, 4 & 5) SAVINGS ANALYSIS + MONTHLY EXPENSES + EXPENSE BREAKDOWN
 # =================================================
 # =================================================
+# 3, 4 & 5) SAVINGS ANALYSIS + MONTHLY EXPENSES + EXPENSE BREAKDOWN
+# =================================================
+top_left, top_right = st.columns([1, 1])  # Savings left, Expenses+Pie right
+
+# =========================
+# Savings Analysis
+# =========================
+with top_left:
+    st.markdown("<div class='card sa'>", unsafe_allow_html=True)
+    st.subheader("Savings Analysis")
+
+    monthly_income = profile['income'] / 12 if profile['income'] else 0
+    total_exp = sum(expenses.values()) if expenses else 0
+    contrib = profile['monthly_contributions'] or 0
+    remaining = monthly_income - total_exp - contrib
+    savings_rate = (remaining / monthly_income * 100) if monthly_income > 0 else 0
+
+    # Status labels
+    if savings_rate >= 20:
+        status_lbl = "<span class='pill' style='background:#065f46;color:#d1fae5;padding:4px 10px;border-radius:12px;font-size:13px;'>🟢 Good</span>"
+        alert_html = "<div class='alert' style='background:rgba(16,185,129,.1);border-left:4px solid #10b981'>Great job! You're on track with your savings rate.</div>"
+    elif savings_rate >= 10:
+        status_lbl = "<span class='pill' style='background:#78350f;color:#fef3c7;padding:4px 10px;border-radius:12px;font-size:13px;'>🟡 Fair</span>"
+        alert_html = "<div class='alert' style='background:rgba(245,158,11,.1);border-left:4px solid #f59e0b'>Consider increasing contributions to reach your long-term goals.</div>"
+    else:
+        status_lbl = "<span class='pill' style='background:#7f1d1d;color:#fee2e2;padding:4px 10px;border-radius:12px;font-size:13px;'>🔴 Poor</span>"
+        alert_html = "<div class='alert' style='background:rgba(239,68,68,.1);border-left:4px solid #ef4444'>Critical Action Needed: Reduce expenses or increase income.</div>"
+
+    # Big metric
+    st.markdown(f"""
+        <div style="text-align:center;margin-bottom:12px">
+            <div style="font-size:42px;font-weight:700;color:#8b5cf6">{savings_rate:.1f}%</div>
+            <div style="font-size:15px;color:#9ca3af;margin-top:-4px">Savings Rate</div>
+            <div style="margin-top:6px">{status_lbl}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Breakdown values
+    st.write(f"**💸 Monthly Income:** {currency(monthly_income)}")
+    st.write(f"**🏠 Monthly Expenses:** {currency(total_exp)}")
+    st.write(f"**📈 Contributions:** {currency(contrib)}")
+    st.write(f"**💰 Remaining:** {currency(remaining)}")
+
+    # Percent shares
+    exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
+    ctr_share = (contrib / monthly_income * 100) if monthly_income else 0
+    sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
+
+    # Gradient progress bars
+    bar_html = f"""
+    <div style="margin-top:10px">
+        <div style="margin-bottom:6px;font-size:13px;color:#d1d5db">Expenses — {exp_share:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{exp_share:.1f}%;height:10px;background:linear-gradient(90deg,#ef4444,#f87171);border-radius:6px"></div>
+        </div>
+
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Contributions — {ctr_share:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{ctr_share:.1f}%;height:10px;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:6px"></div>
+        </div>
+
+        <div style="margin:10px 0 6px;font-size:13px;color:#d1d5db">Savings — {sav_share:.1f}%</div>
+        <div style="height:10px;border-radius:6px;background:#1f2937">
+            <div style="width:{sav_share:.1f}%;height:10px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:6px"></div>
+        </div>
+    </div>
+    """
+    st.markdown(bar_html, unsafe_allow_html=True)
+
+    # Alert box
+    st.markdown(alert_html, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================
+# Monthly Expenses + Pie
+# =========================
+with top_right:
+    left, right = st.columns([1.2, 1])  # bigger left for expense grid
+
+    with left:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Monthly Expenses")
+
+        total_monthly = sum(expenses.values()) if expenses else 0
+
+        st.markdown(f"""
+            <div style="text-align:center;margin-bottom:18px">
+                <div style="font-size:36px;font-weight:700;color:#facc15">{currency(total_monthly)}</div>
+                <div style="font-size:15px;color:#9ca3af">Total Monthly Expenses</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+        # Expense grid with icons
+        grid = st.columns(3)
+        icons = ["🏠","💡","🍔","✈️","🛡️","🎬","🎨","🎁","⚡"]
+        for i, (k, v) in enumerate(expenses.items()):
+            p = (v / total_monthly * 100) if total_monthly else 0
+            with grid[i % 3]:
+                st.markdown(f"""
+                    <div class='metric-box'>
+                        <div style="font-size:20px;margin-bottom:4px">{icons[i % len(icons)]}</div>
+                        <div class='metric-value'>{currency(v)}</div>
+                        <div class='metric-label'>{k}</div>
+                        <div class='caption'>{p:.1f}% of total</div>
+                    </div>
+                """, unsafe_allow_html=True)
+
+        st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with right:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.subheader("Expense Breakdown")
+        labels, values = list(expenses.keys()), list(expenses.values())
+        pie = go.Figure(go.Pie(
+            labels=labels, values=values, hole=0.55, sort=False,
+            hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
+        ))
+        pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
+        pie.update_layout(showlegend=True,
+                          legend=dict(font=dict(color="white")),
+                          margin=dict(l=4,r=4,t=4,b=4),
+                          paper_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(pie, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# =================================================
 # 5 & 6) EXPENSE BREAKDOWN + 20-YEAR INVESTMENT SCENARIOS
 # =================================================
 b_left, b_right = st.columns([1,1])
