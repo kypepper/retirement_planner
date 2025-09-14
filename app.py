@@ -40,7 +40,8 @@ st.markdown("""
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 140px;  /* ✅ Uniform sizing */
+  /* ✅ Enforce uniform sizing */
+  min-height: 140px;   /* adjust as needed */
 }
 
 .metric-value {
@@ -249,7 +250,7 @@ with st.container():
 # =================================================
 # 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
-left, right = st.columns(2)
+left, right = st.columns([0.9, 1.1])
 
 with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
