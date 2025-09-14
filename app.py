@@ -197,41 +197,81 @@ with st.container():
     balances = []
     current = profile['cash'] + profile['investments']
     contrib0 = profile['monthly_contributions']
-    salary_growth = profile['salary_growth']/100.0
-    annual_return = profile['annual_return']/100.0
-  
-    annual_expenses = sum(expenses.values()) * 12  # ✅ total yearly expenses
+    salary_growth = profile['salary_growth'] / 100.0
+    annual_return = profile['annual_return'] / 100.0
+
+    annual_expenses = sum(expenses.values()) * 12   # ✅ yearly expenses
+    annual_income = profile['income']               # ✅ yearly income
+
     for age in years:
         yrs = age - profile['age']
         contrib_this_year = contrib0 * ((1 + salary_growth) ** max(0, yrs))
+
         if age < profile['retirement_age']:
-            current = current*(1+annual_return) + contrib_this_year*12
+            # Working years: grow + contributions
+            current = current * (1 + annual_return) + contrib_this_year * 12
+
+            # If expenses exceed income → subtract the shortfall
+            net_cashflow = annual_income - annual_expenses
+            if net_cashflow < 0:
+                current += net_cashflow  # negative reduces savings
         else:
-            current = current*(1+annual_return)
-            current = max(current, 0)  # ✅ avoid going negative in graph
+            # Retirement years: grow but subtract full expenses
+            current = current * (1 + annual_return) - annual_expenses
+
+        current = max(current, 0)  # ✅ avoid negative balances
         balances.append(current)
 
     years_to_ret = profile['retirement_age'] - profile['age']
-    goal_future = profile['retirement_goal'] * ((1 + profile['inflation']/100) ** years_to_ret)
+    goal_future = profile['retirement_goal'] * ((1 + profile['inflation'] / 100) ** years_to_ret)
 
     ret_index = profile['retirement_age'] - profile['age']
     projected = balances[ret_index] if 0 <= ret_index < len(balances) else balances[-1]
     on_track = projected >= goal_future
 
     cols = st.columns(3, gap="large")
-    cols[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div></div>", unsafe_allow_html=True)
-    cols[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
+    cols[0].markdown(
+        f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div>"
+        f"<div class='metric-label'>Projected at Retirement</div></div>",
+        unsafe_allow_html=True
+    )
+    cols[1].markdown(
+        f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div>"
+        f"<div class='metric-label'>Inflation-Adjusted Goal</div>"
+        f"<div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>",
+        unsafe_allow_html=True
+    )
     status_class = "text-good" if on_track else "text-bad"
     status_text = "✅ On Track" if on_track else "⚠ Shortfall"
-    cols[2].markdown(f"<div class='metric-box'><div class='metric-value {status_class}'>{status_text}</div><div class='metric-label'>Status</div></div>", unsafe_allow_html=True)
+    cols[2].markdown(
+        f"<div class='metric-box'><div class='metric-value {status_class}'>{status_text}</div>"
+        f"<div class='metric-label'>Status</div></div>",
+        unsafe_allow_html=True
+    )
 
-    fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines", line=dict(color="#22c55e", width=3), name="Projected Balance"))
-    fig.add_scatter(x=[profile['retirement_age']], y=[projected], mode="markers+text", marker=dict(size=10, color="yellow"), text=["Retirement"], textposition="top center", name="Retirement Age")
-    fig.add_hline(y=goal_future, line_dash="dash", line_color="#22d3ee", annotation_text="Inflation-Adjusted Goal", annotation_position="top left")
-    fig.update_layout(margin=dict(l=8, r=8, t=8, b=8), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", font=dict(color="white"), height=420, legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+    fig = go.Figure(go.Scatter(
+        x=years, y=balances, mode="lines",
+        line=dict(color="#22c55e", width=3), name="Projected Balance"
+    ))
+    fig.add_scatter(
+        x=[profile['retirement_age']], y=[projected],
+        mode="markers+text", marker=dict(size=10, color="yellow"),
+        text=["Retirement"], textposition="top center", name="Retirement Age"
+    )
+    fig.add_hline(
+        y=goal_future, line_dash="dash", line_color="#22d3ee",
+        annotation_text="Inflation-Adjusted Goal", annotation_position="top left"
+    )
+    fig.update_layout(
+        margin=dict(l=8, r=8, t=8, b=8),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(color="white"),
+        height=420,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+    )
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
-
 
 # =================================================
 # 3) SAVINGS ANALYSIS + 4) EXPENSES
