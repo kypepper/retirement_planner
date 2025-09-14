@@ -226,7 +226,6 @@ with st.container():
             current = current*(1+annual_return)
         balances.append(current)
 
-    # inflation-adjusted goal
     years_to_ret = profile['retirement_age'] - profile['age']
     goal_future = profile['retirement_goal'] * ((1 + profile['inflation']/100) ** years_to_ret)
 
@@ -234,23 +233,55 @@ with st.container():
     projected = balances[ret_index] if 0 <= ret_index < len(balances) else balances[-1]
     on_track = projected >= goal_future
 
-    mm = st.columns(3)
-    mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div></div>", unsafe_allow_html=True)
-    mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
-    status_class = "text-good" if on_track else "text-bad"
-    status_text = "✅ On Track" if on_track else "⚠ Shortfall"
-    mm[2].markdown(f"<div class='metric-box'><div class='metric-value {status_class}'>{status_text}</div><div class='metric-label'>Status</div></div>", unsafe_allow_html=True)
+    # ✅ Force equal-sized cards
+    mm = st.columns(3, gap="large")
 
-    # chart
-    fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines", line=dict(color="#22c55e", width=3), name="Projected Balance"))
+    with mm[0]:
+        st.markdown(
+            f"<div class='metric-box' style='min-height:100px;'>"
+            f"<div class='metric-value text-primary'>{currency(projected)}</div>"
+            f"<div class='metric-label'>Projected at Retirement</div></div>",
+            unsafe_allow_html=True
+        )
+
+    with mm[1]:
+        st.markdown(
+            f"<div class='metric-box' style='min-height:100px;'>"
+            f"<div class='metric-value text-purple'>{currency(goal_future)}</div>"
+            f"<div class='metric-label'>Inflation-Adjusted Goal</div>"
+            f"<div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>",
+            unsafe_allow_html=True
+        )
+
+    with mm[2]:
+        status_class = "text-good" if on_track else "text-bad"
+        status_text = "✅ On Track" if on_track else "⚠ Shortfall"
+        st.markdown(
+            f"<div class='metric-box' style='min-height:100px;'>"
+            f"<div class='metric-value {status_class}'>{status_text}</div>"
+            f"<div class='metric-label'>Status</div>"
+            f"<div class='caption'>Projected vs inflated goal.</div></div>",
+            unsafe_allow_html=True
+        )
+
+    # Chart
+    fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
+                               line=dict(color="#22c55e", width=3), name="Projected Balance"))
     fig.add_scatter(x=[profile['retirement_age']], y=[projected], mode="markers+text",
-                    marker=dict(size=10, color="yellow"), text=["Retirement"], textposition="top center", name="Retirement Age")
+                    marker=dict(size=10, color="yellow"), text=["Retirement"],
+                    textposition="top center", name="Retirement Age")
     fig.add_hline(y=goal_future, line_dash="dash", line_color="#22d3ee",
                   annotation_text="Inflation-Adjusted Goal", annotation_position="top left")
-    fig.update_layout(margin=dict(l=8,r=8,t=8,b=8), paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                      font=dict(color="white"), height=320, legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+    fig.update_layout(margin=dict(l=8, r=8, t=8, b=8),
+                      paper_bgcolor="rgba(0,0,0,0)",
+                      plot_bgcolor="rgba(0,0,0,0)",
+                      font=dict(color="white"),
+                      height=320,
+                      legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                                  xanchor="right", x=1))
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =================================================
 # 3) SAVINGS ANALYSIS
