@@ -60,6 +60,20 @@ st.markdown("""
   opacity: 0.7;
   margin-top: 4px;
 }
+.tip-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: left;
+  min-height: 120px;
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.tip-card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  transform: translateY(-2px);
+}
 
 .text-primary { color: var(--primary) !important; }
 .text-good    { color: var(--good) !important; }
@@ -412,12 +426,23 @@ with b_right:
 # =================================================
 with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("Quick Tips")
+    st.subheader("💡 Quick Tips")
 
-    t = st.columns(3)
-    t[0].markdown("<div class='tip'>🎯 <b>Emergency Fund</b><br><span class='small'>Target 3–6 months of expenses in cash or high-yield savings.</span></div>", unsafe_allow_html=True)
-    t[1].markdown("<div class='tip'>📈 <b>Increase Savings Rate</b><br><span class='small'>Automate transfers and aim for 20%+ of income when possible.</span></div>", unsafe_allow_html=True)
-    t[2].markdown("<div class='tip'>🔄 <b>Review Regularly</b><br><span class='small'>Revisit your plan every 6 months and adjust for life changes.</span></div>", unsafe_allow_html=True)
+    tips = [
+        ("Emergency Fund", "🎯", "Target 3–6 months of expenses in cash or high-yield savings."),
+        ("Increase Savings Rate", "📈", "Automate transfers and aim for 20%+ of income when possible."),
+        ("Review Regularly", "🔄", "Revisit your plan every 6 months and adjust for life changes.")
+    ]
+
+    cols = st.columns(3, gap="large")
+    for col, (title, icon, desc) in zip(cols, tips):
+        with col:
+            st.markdown(
+                f"<div class='tip-card'>"
+                f"<div style='font-weight:600; font-size:1.05rem;'>{icon} {title}</div>"
+                f"<div style='font-size:0.9rem; margin-top:6px; opacity:0.85;'>{desc}</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 
     st.markdown("</div>", unsafe_allow_html=True)
-
