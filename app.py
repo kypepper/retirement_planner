@@ -116,10 +116,10 @@ if "loaded" not in st.session_state:
 # -------------------------------------------------
 if "profile" not in st.session_state:
     st.session_state.profile = {
-        "age": 65, "status": "working", "income": 100000,
+        "age": 25, "status": "working", "income": 100000,
         "cash": 25000, "investments": 1000000,
         "monthly_contributions": 0, "annual_return": 5,
-        "retirement_age": 80, "retirement_goal": 3500000,
+        "retirement_age": 60, "retirement_goal": 3500000,
         "social_security": 3000, "tax_rate": 22,
         "inflation": 2.5,
         "salary_growth": 3.0,
