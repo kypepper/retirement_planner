@@ -249,10 +249,9 @@ with st.container():
 # =================================================
 # 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
-# =================================================
-# 3) SAVINGS ANALYSIS
-# =================================================
-with st.container():
+left, right = st.columns(2)
+
+with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📊 Savings Analysis")
 
@@ -260,8 +259,6 @@ with st.container():
     total_exp = sum(expenses.values())
     contrib = profile['monthly_contributions']
     remaining = monthly_income - total_exp - contrib
-
-    # ✅ Fix NaN edge case
     savings_rate = (remaining/monthly_income*100) if monthly_income > 0 else 0
 
     # Status + alert
@@ -270,12 +267,12 @@ with st.container():
         alert_html = "<div style='background:#064e3b;color:#a7f3d0;padding:10px;border-radius:10px;'>✅ Great job! You're on track with your savings rate.</div>"
     elif savings_rate >= 10:
         status_lbl = "<span class='text-warn'>🟡 Fair</span>"
-        alert_html = "<div style='background:#78350f;color:#fcd34d;padding:10px;border-radius:10px;'>⚠ Consider increasing contributions to reach your long-term goals.</div>"
+        alert_html = "<div style='background:#78350f;color:#fcd34d;padding:10px;border-radius:10px;'>⚠ Consider increasing contributions to reach your goals.</div>"
     else:
-        status_lbl = "<span class='text-bad'>🔴 Poor</span>"
+        status_lbl = "<span class='text-bad'>🔴 Needs Improvement</span>"
         alert_html = "<div style='background:#7f1d1d;color:#fecaca;padding:10px;border-radius:10px;'>⚠ Critical Action Needed: Reduce expenses or increase income.</div>"
 
-    # Show savings rate metric
+    # Top metric
     st.markdown(
         f"<div class='metric-box'>"
         f"<div class='metric-value text-purple'>{savings_rate:.1f}%</div>"
@@ -291,44 +288,60 @@ with st.container():
     st.write(f"**Contributions:** {currency(contrib)}")
     st.write(f"**Remaining:** {currency(remaining)}")
 
-    # ✅ Progress bars
+    # Progress bars
     exp_share = (total_exp/monthly_income*100) if monthly_income else 0
     ctr_share = (contrib/monthly_income*100) if monthly_income else 0
     sav_share = max(0.0, 100 - exp_share - ctr_share) if monthly_income else 0
 
-    st.markdown(
-        f"<div style='margin-top:8px;'>"
-        f"<b>Expenses</b> — {exp_share:.1f}%"
-        f"<div style='height:10px;background:#374151;border-radius:6px;'>"
-        f"<div style='width:{exp_share:.1f}%;background:#ef4444;height:10px;border-radius:6px;'></div>"
-        f"</div></div>",
-        unsafe_allow_html=True
-    )
+    for lbl, pct, color in [
+        ("Expenses", exp_share, "#ef4444"),
+        ("Contributions", ctr_share, "#3b82f6"),
+        ("Savings", sav_share, "#10b981")
+    ]:
+        st.markdown(
+            f"<div style='margin-top:8px;'>"
+            f"<b>{lbl}</b> — {pct:.1f}%"
+            f"<div style='height:10px;background:#374151;border-radius:6px;'>"
+            f"<div style='width:{pct:.1f}%;background:{color};height:10px;border-radius:6px;'></div>"
+            f"</div></div>",
+            unsafe_allow_html=True
+        )
 
-    st.markdown(
-        f"<div style='margin-top:8px;'>"
-        f"<b>Contributions</b> — {ctr_share:.1f}%"
-        f"<div style='height:10px;background:#374151;border-radius:6px;'>"
-        f"<div style='width:{ctr_share:.1f}%;background:#3b82f6;height:10px;border-radius:6px;'></div>"
-        f"</div></div>",
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        f"<div style='margin-top:8px;'>"
-        f"<b>Savings</b> — {sav_share:.1f}%"
-        f"<div style='height:10px;background:#374151;border-radius:6px;'>"
-        f"<div style='width:{sav_share:.1f}%;background:#10b981;height:10px;border-radius:6px;'></div>"
-        f"</div></div>",
-        unsafe_allow_html=True
-    )
-
-    # ✅ Status message block
+    # Status message block
     st.markdown(alert_html, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 
+with right:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("💰 Monthly Expenses")
 
+    total_monthly = sum(expenses.values())
+    st.markdown(
+        f"<div class='metric-value text-warn'>{currency(total_monthly)}</div>"
+        f"<div class='metric-label'>Total Monthly Expenses</div>",
+        unsafe_allow_html=True
+    )
+
+    grid = st.columns(3, gap="large")
+    for i, (k, v) in enumerate(expenses.items()):
+        p = (v/total_monthly*100) if total_monthly else 0
+        with grid[i % 3]:
+            st.markdown(
+                f"<div class='metric-box'>"
+                f"<div class='metric-value'>{currency(v)}</div>"
+                f"<div class='metric-label'>{k}</div>"
+                f"<div class='caption'>{p:.1f}% of total</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+    st.markdown(
+        f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>",
+        unsafe_allow_html=True
+    )
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
 # 5) EXPENSE BREAKDOWN + 6) 20-YEAR INVESTMENT SCENARIOS
