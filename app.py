@@ -108,7 +108,7 @@ if "profile" not in st.session_state:
         "annual_return": 5, "retirement_age": 65, "retirement_goal": 3500000,
         "social_security": 0, "tax_rate": 22, "inflation": 2.5,
         "salary_growth": 3.0,
-        "cash_contrib_pct": 0.0,   # ✅ NEW: % of after-tax income
+        "cash_contrib_pct": 5.0,   # ✅ NEW: % of after-tax income
     }
 
 
