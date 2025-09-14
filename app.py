@@ -346,6 +346,7 @@ with st.container():
     st.markdown(alert_html, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+
 # =================================================
 # 4) MONTHLY EXPENSES
 # =================================================
