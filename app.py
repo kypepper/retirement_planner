@@ -308,7 +308,10 @@ with left:
         )
 
     # Status message block
+    # ✅ Add spacing before the alert
+    st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
     st.markdown(alert_html, unsafe_allow_html=True)
+
 
     st.markdown("</div>", unsafe_allow_html=True)
 
