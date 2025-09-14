@@ -278,7 +278,45 @@ with st.container():
 # =================================================
 # 3, 4 & 5) SAVINGS ANALYSIS + MONTHLY EXPENSES + EXPENSE BREAKDOWN
 # =================================================
-top_left, top_right = st.columns([1, 1])  # Savings left, Expenses+Pie right
+# =================================================
+# 5 & 6) EXPENSE BREAKDOWN + 20-YEAR INVESTMENT SCENARIOS
+# =================================================
+b_left, b_right = st.columns([1,1])
+
+with b_left:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("Expense Breakdown")
+    labels, values = list(expenses.keys()), list(expenses.values())
+    pie = go.Figure(go.Pie(
+        labels=labels, values=values, hole=0.55, sort=False,
+        hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
+    ))
+    pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
+    pie.update_layout(showlegend=True,
+                      legend=dict(font=dict(color="white")),
+                      margin=dict(l=4,r=4,t=4,b=4),
+                      paper_bgcolor="rgba(0,0,0,0)")
+    st.plotly_chart(pie, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with b_right:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("20-Year Investment Scenarios")
+
+    def compound(principal, monthly, years, annual_pct):
+        r = (annual_pct/100)/12
+        n = years*12
+        return principal*(1+r)**n + (monthly*((1+r)**n - 1)/r if r else monthly*n)
+
+    principal = profile['cash'] + profile['investments']
+    hy = compound(principal, profile['monthly_contributions'], 20, 5)
+    sp = compound(principal, profile['monthly_contributions'], 20, 10)
+
+    c = st.columns(2)
+    c[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(hy)}</div><div class='metric-label'>High-Yield Savings</div><div class='caption'>Stable growth (~5% APY)</div></div>", unsafe_allow_html=True)
+    c[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(sp)}</div><div class='metric-label'>S&P 500 Index</div><div class='caption'>Market growth (~10% Avg.)</div></div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =========================
 # Savings Analysis
