@@ -288,9 +288,12 @@ with st.container():
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
-# 3) SAVINGS ANALYSIS
+# 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
-with st.container():
+left, spacer, right = st.columns([0.9, 0.05, 1])
+
+# --- Savings Analysis ---
+with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📊 Savings Analysis")
 
@@ -359,6 +362,54 @@ with st.container():
     # --- Status message block ---
     st.markdown("<div style='margin-top:20px;'></div>", unsafe_allow_html=True)
     st.markdown(alert_html, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+
+# --- Expenses ---
+with right:
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+
+    header_l, header_r = st.columns([0.8, 0.2])
+    with header_l:
+        st.subheader("💰 Monthly Expenses")
+    with header_r:
+        if st.button("✏️ Edit" if not st.session_state.edit_expenses_open else "❌ Close", key="edit_expenses_btn"):
+            st.session_state.edit_expenses_open = not st.session_state.edit_expenses_open
+            st.rerun()
+
+    if st.session_state.edit_expenses_open:
+        with st.form("expenses_form", clear_on_submit=False):
+            new = {}
+            cols = st.columns(3)
+            for i, (k, v) in enumerate(expenses.items()):
+                with cols[i % 3]:
+                    new[k] = st.number_input(k, value=v, step=25, min_value=0)
+            if st.form_submit_button("💾 Save Changes"):
+                st.session_state.expenses = new
+                st.session_state.edit_expenses_open = False
+                st.rerun()
+
+    total_monthly = sum(st.session_state.expenses.values())
+    st.markdown(
+        f"<div class='metric-value text-warn'>{currency(total_monthly)}</div>"
+        f"<div class='metric-label'>Total Monthly Expenses</div>",
+        unsafe_allow_html=True
+    )
+
+    grid = st.columns(3, gap="small")
+    for i, (k, v) in enumerate(st.session_state.expenses.items()):
+        p = (v / total_monthly * 100) if total_monthly else 0
+        with grid[i % 3]:
+            st.markdown(
+                f"<div class='metric-box' style='margin-bottom:18px;'>"
+                f"<div class='metric-value'>{currency(v)}</div>"
+                f"<div class='metric-label'>{k}</div>"
+                f"<div class='caption'>{p:.1f}% of total</div>"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+    st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly * 12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 # =================================================
