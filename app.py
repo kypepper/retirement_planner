@@ -364,8 +364,15 @@ with b_left:
         hovertemplate="<b>%{label}</b><br>$%{value:,.0f}<br>%{percent}<extra></extra>"
     ))
     pie.update_traces(marker=dict(line=dict(color="#0b1220", width=2)))
-    pie.update_layout(showlegend=True, legend=dict(font=dict(color="white")),
-                      margin=dict(l=4, r=4, t=4, b=4), paper_bgcolor="rgba(0,0,0,0)")
+    pie.update_layout(
+    showlegend=True,
+    legend=dict(
+        font=dict(size=14),     # ✅ Bigger legend text
+        itemsizing="constant"   # ✅ Keeps marker size consistent
+    ),
+    margin=dict(l=4, r=4, t=4, b=4),
+    paper_bgcolor="rgba(0,0,0,0)"
+)
     st.plotly_chart(pie, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
