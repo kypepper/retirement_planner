@@ -105,7 +105,7 @@ if "profile" not in st.session_state:
     st.session_state.profile = {
         "age": 25, "status": "working", "income": 100000,
         "cash": 25000, "investments": 50000, "monthly_contributions": 1000,
-        "annual_return": 5, "retirement_age": 65, "retirement_goal": 3500000,
+        "annual_return": 5, "retirement_age": 65, "retirement_goal": 3000000,
         "social_security": 0, "tax_rate": 22, "inflation": 2,
         "salary_growth": 4.0,
         "cash_contrib_pct": 5.0,   # ✅ NEW: % of after-tax income
