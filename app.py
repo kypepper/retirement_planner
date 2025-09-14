@@ -108,7 +108,9 @@ if "profile" not in st.session_state:
         "annual_return": 5, "retirement_age": 65, "retirement_goal": 3500000,
         "social_security": 0, "tax_rate": 22, "inflation": 2.5,
         "salary_growth": 3.0,
+        "cash_contrib_pct": 0.0,   # ✅ NEW: % of after-tax income
     }
+
 
 if "expenses" not in st.session_state:
     st.session_state.expenses = {
@@ -164,6 +166,9 @@ with st.container():
             c12, c13 = st.columns(2)
             infl = c12.number_input("Inflation (%)", value=float(profile["inflation"]), step=0.1, format="%.1f")
             sal_g = c13.number_input("Salary Growth (%)", value=float(profile["salary_growth"]), step=0.1, format="%.1f")
+            cash_pct = c14.number_input("Cash Contrib (% of after-tax income)", 
+                            value=float(profile.get("cash_contrib_pct", 0.0)), 
+                            step=0.5, format="%.1f")
 
             save = st.form_submit_button("💾 Save Changes")  # ✅ inside form
             if save:
@@ -181,6 +186,7 @@ with st.container():
                     "retirement_goal": goal,
                     "inflation": infl,
                     "salary_growth": sal_g,
+                    "cash_contrib_pct": cash_pct,  # ✅ save new field
                 }
                 st.session_state.edit_profile_open = False
                 st.rerun()
@@ -200,23 +206,30 @@ with st.container():
     salary_growth = profile['salary_growth'] / 100.0
     annual_return = profile['annual_return'] / 100.0
 
-    annual_expenses = sum(expenses.values()) * 12   # ✅ yearly expenses
-    annual_income = profile['income']               # ✅ yearly income
+    annual_expenses = sum(expenses.values()) * 12
+    annual_income = profile['income']
 
     for age in years:
         yrs = age - profile['age']
-        contrib_this_year = contrib0 * ((1 + salary_growth) ** max(0, yrs))
+        # Salary growth applied to income
+        income_this_year = annual_income * ((1 + salary_growth) ** yrs)
+        after_tax_income = income_this_year * (1 - profile["tax_rate"] / 100)
+
+        # Fixed monthly contributions (existing)
+        fixed_contrib = contrib0 * ((1 + salary_growth) ** max(0, yrs)) * 12
+
+        # New percentage-based cash contributions
+        pct_contrib = after_tax_income * (profile.get("cash_contrib_pct", 0) / 100)
+
+        total_contrib = fixed_contrib + pct_contrib
 
         if age < profile['retirement_age']:
-            # Working years: grow + contributions
-            current = current * (1 + annual_return) + contrib_this_year * 12
-
-            # If expenses exceed income → subtract the shortfall
-            net_cashflow = annual_income - annual_expenses
+            current = current * (1 + annual_return) + total_contrib
+            # Adjust for expense shortfall
+            net_cashflow = after_tax_income - annual_expenses
             if net_cashflow < 0:
-                current += net_cashflow  # negative reduces savings
+                current += net_cashflow
         else:
-            # Retirement years: grow but subtract full expenses
             current = current * (1 + annual_return) - annual_expenses
 
         current = max(current, 0)  # ✅ avoid negative balances
