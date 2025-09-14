@@ -126,64 +126,34 @@ def currency(x): return f"${x:,.0f}"
 # =================================================
 # 1) FINANCIAL PROFILE
 # =================================================
-with st.container():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    ctitle1, ctitle2 = st.columns([0.8, 0.2])
-    with ctitle1:
-        st.subheader("Financial Profile")
-    with ctitle2:
-        if st.button(("Close" if st.session_state.edit_profile_open else "Edit"), key="edit_profile_txt"):
-            st.session_state.edit_profile_open = not st.session_state.edit_profile_open
-
-    if st.session_state.edit_profile_open:
-        with st.form("profile_form", clear_on_submit=False):
-            c1, c2, c3, c4 = st.columns(4)
-            age = c1.number_input("Age", value=profile["age"], min_value=0, max_value=120)
-            status = c2.selectbox("Status", ["working", "retired"], index=0 if profile["status"]=="working" else 1)
-            income = c3.number_input("Annual Income", value=profile["income"], step=1000)
-            ss = c4.number_input("Social Security / mo", value=profile["social_security"], step=50)
-
-            c5, c6, c7, c8 = st.columns(4)
-            cash = c5.number_input("Cash Savings", value=profile["cash"], step=500)
-            inv = c6.number_input("Investments", value=profile["investments"], step=1000)
-            contr = c7.number_input("Monthly Contributions", value=profile["monthly_contributions"], step=50)
-            ret = c8.number_input("Annual Return (%)", value=profile["annual_return"], step=1)
-
-            c9, c10, c11, c12 = st.columns(4)
-            tax = c9.number_input("Tax Rate (%)", value=profile["tax_rate"], step=1)
-            r_age = c10.number_input("Retirement Age", value=profile["retirement_age"], step=1)
-            goal = c11.number_input("Retirement Goal (today $)", value=profile["retirement_goal"], step=50000)
-            infl = c12.number_input("Inflation (%)", value=profile["inflation"], step=0.1, format="%.1f")
-
-            c13, _ = st.columns([1,3])
-            sal_g = c13.number_input("Annual Salary Growth (%)", value=profile["salary_growth"], step=0.1, format="%.1f")
-
-            save = st.form_submit_button("💾 Save Changes")
-            if save:
-                profile.update({
-                    "age":age,"status":status,"income":income,"social_security":ss,
-                    "cash":cash,"investments":inv,"monthly_contributions":contr,
-                    "annual_return":ret,"tax_rate":tax,"retirement_age":r_age,"retirement_goal":goal,
-                    "inflation": infl,"salary_growth": sal_g
-                })
-                st.session_state.profile = profile
-                st.success("Profile updated.")
-
-    # metrics
-    st.markdown("<hr class='div'/>", unsafe_allow_html=True)
-    m = st.columns(6)
-    m[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['age']}</div><div class='metric-label'>Age</div></div>", unsafe_allow_html=True)
-    m[1].markdown(f"<div class='metric-box'><div class='metric-value text-good'>{currency(profile['income'])}</div><div class='metric-label'>Annual Income</div></div>", unsafe_allow_html=True)
-    m[2].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(profile['cash']+profile['investments'])}</div><div class='metric-label'>Total Savings</div></div>", unsafe_allow_html=True)
-    m[3].markdown(f"<div class='metric-box'><div class='metric-value text-warn'>{profile['annual_return']}%</div><div class='metric-label'>Expected Return</div></div>", unsafe_allow_html=True)
-    m[4].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['inflation']:.1f}%</div><div class='metric-label'>Inflation</div></div>", unsafe_allow_html=True)
-    m[5].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{profile['salary_growth']:.1f}%</div><div class='metric-label'>Salary Growth</div></div>", unsafe_allow_html=True)
-    st.markdown(f"<span class='pill pill-on'>{profile['status'].capitalize()}</span>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+if st.session_state.edit_profile_open:
+    with st.form("profile_form", clear_on_submit=False):
+        # ... all your inputs ...
+        save = st.form_submit_button("💾 Save Changes")
+        if save:
+            st.session_state.profile = {
+                "age": age,
+                "status": status,
+                "income": income,
+                "social_security": ss,
+                "cash": cash,
+                "investments": inv,
+                "monthly_contributions": contr,
+                "annual_return": ret,
+                "tax_rate": tax,
+                "retirement_age": r_age,
+                "retirement_goal": goal,
+                "inflation": infl,
+                "salary_growth": sal_g,
+            }
+            st.session_state.edit_profile_open = False
+            st.rerun()  # ✅ force all cards/graphs to recalc
 
 # =================================================
 # 2) RETIREMENT PROJECTION
 # =================================================
+profile = st.session_state.profile  # ✅ ensure fresh values for calculations here
+
 with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("Retirement Projection")
@@ -264,6 +234,9 @@ with st.container():
 # =================================================
 # 3) SAVINGS ANALYSIS + 4) EXPENSES
 # =================================================
+profile  = st.session_state.profile   # ✅ fresh
+expenses = st.session_state.expenses  # ✅ fresh
+
 left, spacer, right = st.columns([0.9, 0.05, 1]) 
 
 with left:
@@ -331,6 +304,15 @@ with left:
     st.markdown("</div>", unsafe_allow_html=True)
 
 with right:
+  if st.session_state.edit_expenses_open:
+    with st.form("expenses_form", clear_on_submit=False):
+        new = {}
+        # ... collect inputs into new ...
+        if st.form_submit_button("💾 Save Changes"):
+            st.session_state.expenses = new
+            st.session_state.edit_expenses_open = False
+            st.rerun()  # ✅ refresh all dependent cards/graphs
+
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("💰 Monthly Expenses")
 
@@ -391,6 +373,9 @@ with b_left:
     st.markdown("</div>", unsafe_allow_html=True)
 
 with b_right:
+    profile  = st.session_state.profile
+    expenses = st.session_state.expenses
+
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.subheader("📈 20-Year Investment Scenarios")
 
