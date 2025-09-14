@@ -323,12 +323,14 @@ with right:
         unsafe_allow_html=True
     )
 
-    grid = st.columns(3, gap="large")
+    # ✅ Adjust grid: smaller horizontal gaps
+    grid = st.columns(3, gap="small")
+
     for i, (k, v) in enumerate(expenses.items()):
         p = (v/total_monthly*100) if total_monthly else 0
         with grid[i % 3]:
             st.markdown(
-                f"<div class='metric-box'>"
+                f"<div class='metric-box' style='margin-bottom:18px;'>"
                 f"<div class='metric-value'>{currency(v)}</div>"
                 f"<div class='metric-label'>{k}</div>"
                 f"<div class='caption'>{p:.1f}% of total</div>"
@@ -340,8 +342,8 @@ with right:
         f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>",
         unsafe_allow_html=True
     )
-
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =================================================
 # 5) EXPENSE BREAKDOWN + 6) 20-YEAR INVESTMENT SCENARIOS
