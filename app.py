@@ -114,7 +114,7 @@ if "loaded" not in st.session_state:
     )
     time.sleep(1.2)
     st.session_state["loaded"] = True
-    st.experimental_rerun()
+    st.rerun()
 
 # -------------------------------------------------
 # Session state (data + edit toggles)
