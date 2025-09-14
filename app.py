@@ -199,7 +199,8 @@ with st.container():
     contrib0 = profile['monthly_contributions']
     salary_growth = profile['salary_growth']/100.0
     annual_return = profile['annual_return']/100.0
-
+  
+    annual_expenses = sum(expenses.values()) * 12  # ✅ total yearly expenses
     for age in years:
         yrs = age - profile['age']
         contrib_this_year = contrib0 * ((1 + salary_growth) ** max(0, yrs))
@@ -207,6 +208,7 @@ with st.container():
             current = current*(1+annual_return) + contrib_this_year*12
         else:
             current = current*(1+annual_return)
+            current = max(current, 0)  # ✅ avoid going negative in graph
         balances.append(current)
 
     years_to_ret = profile['retirement_age'] - profile['age']
