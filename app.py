@@ -275,7 +275,6 @@ with st.container():
                       legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
     st.plotly_chart(fig, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
-
 # =================================================
 # 3) SAVINGS ANALYSIS
 # =================================================
@@ -310,10 +309,10 @@ with st.container():
     """, unsafe_allow_html=True)
 
     # Breakdown values
-    st.write(f"**Monthly Income:** {currency(monthly_income)}")
-    st.write(f"**Monthly Expenses:** {currency(total_exp)}")
-    st.write(f"**Investment Contributions:** {currency(contrib)}")
-    st.write(f"**Remaining:** {currency(remaining)}")
+    st.write(f"**💸 Monthly Income:** {currency(monthly_income)}")
+    st.write(f"**🏠 Monthly Expenses:** {currency(total_exp)}")
+    st.write(f"**📈 Contributions:** {currency(contrib)}")
+    st.write(f"**💰 Remaining:** {currency(remaining)}")
 
     # Percent shares
     exp_share = (total_exp / monthly_income * 100) if monthly_income else 0
@@ -350,7 +349,7 @@ with st.container():
 # =================================================
 # 4) MONTHLY EXPENSES
 # =================================================
-with right:
+with st.container():
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     header_l, header_r = st.columns([0.8,0.2])
     with header_l: st.subheader("Monthly Expenses")
@@ -364,7 +363,7 @@ with right:
             c1, c2, c3 = st.columns(3)
             keys = list(expenses.keys())
             for i, k in enumerate(keys):
-                col = [c1,c2,c3][i%3]
+                col = [c1, c2, c3][i % 3]
                 with col:
                     new[k] = st.number_input(k, value=expenses[k], step=25, min_value=0)
             if st.form_submit_button("💾 Save Changes"):
@@ -374,17 +373,18 @@ with right:
 
         st.markdown("<hr class='div'/>", unsafe_allow_html=True)
 
-    total_monthly = sum(expenses.values())
+    total_monthly = sum(expenses.values()) if expenses else 0
     st.markdown(f"<div class='metric-value text-warn'>{currency(total_monthly)}</div><div class='metric-label'>Total Monthly Expenses</div>", unsafe_allow_html=True)
 
     grid = st.columns(3)
-    for i,(k,v) in enumerate(expenses.items()):
-        p = (v/total_monthly*100) if total_monthly else 0
-        with grid[i%3]:
+    for i, (k, v) in enumerate(expenses.items()):
+        p = (v / total_monthly * 100) if total_monthly else 0
+        with grid[i % 3]:
             st.markdown(f"<div class='metric-box'><div class='metric-value'>{currency(v)}</div><div class='metric-label'>{k}</div><div class='caption'>{p:.1f}% of total</div></div>", unsafe_allow_html=True)
 
     st.markdown(f"<span class='pill pill-on'>💵 Annual: {currency(total_monthly*12)}</span>", unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =================================================
 # 5) EXPENSE BREAKDOWN
