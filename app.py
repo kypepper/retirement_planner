@@ -222,12 +222,17 @@ with st.container():
         else:
             current = current*(1+annual_return)
         balances.append(current)
-      
-    # Balance at retirement age (instead of final age 90)
+
+    # ✅ Balance at retirement age (instead of final age 90)
     ret_index = profile['retirement_age'] - profile['age']
     projected = balances[ret_index] if 0 <= ret_index < len(balances) else balances[-1]
+
+    # ✅ Define goal and years_to_ret BEFORE using them
+    years_to_ret = max(0, profile['retirement_age'] - profile['age'])
+    goal_future = profile['retirement_goal'] * ((1 + profile['inflation']/100.0) ** years_to_ret)
     on_track = projected >= goal_future
 
+    # Display metrics
     mm = st.columns(3)
     mm[0].markdown(f"<div class='metric-box'><div class='metric-value text-primary'>{currency(projected)}</div><div class='metric-label'>Projected at Retirement</div><div class='caption'>Nominal dollars at retirement.</div></div>", unsafe_allow_html=True)
     mm[1].markdown(f"<div class='metric-box'><div class='metric-value text-purple'>{currency(goal_future)}</div><div class='metric-label'>Inflation-Adjusted Goal</div><div class='caption'>Future value of {currency(profile['retirement_goal'])} in {years_to_ret} yrs.</div></div>", unsafe_allow_html=True)
@@ -243,10 +248,12 @@ with st.container():
         unsafe_allow_html=True,
     )
 
+    # Build chart
     fig = go.Figure(go.Scatter(x=years, y=balances, mode="lines",
                                line=dict(color="#22c55e", width=3),
                                name="Projected Balance"))
-    # Add a marker at retirement age
+
+    # ✅ Marker at retirement age
     fig.add_scatter(
         x=[profile['retirement_age']],
         y=[projected],
@@ -256,8 +263,10 @@ with st.container():
         textposition="top center",
         name="Retirement Age"
     )
+
     fig.add_hline(y=goal_future, line_dash="dash", line_color="#22d3ee",
                   annotation_text="Inflation-Adjusted Goal", annotation_position="top left")
+
     fig.update_layout(margin=dict(l=8,r=8,t=8,b=8),
                       paper_bgcolor="rgba(0,0,0,0)",
                       plot_bgcolor="rgba(0,0,0,0)",
